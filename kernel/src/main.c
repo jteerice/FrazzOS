@@ -1,6 +1,8 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <limine.h>
+#include <flanterm.h>
+#include <backends/fb.h>
 
 // The Limine requests can be placed anywhere, but it is important that
 // the compiler does not optimise them away, so, usually, they should
@@ -85,16 +87,17 @@ void _start(void) {
      || framebuffer_request.response->framebuffer_count < 1) {
         hcf();
     }
-
     // Fetch the first framebuffer.
     struct limine_framebuffer *framebuffer = framebuffer_request.response->framebuffers[0];
 
-    // Note: we assume the framebuffer model is RGB with 32-bit pixels.
-    for (size_t i = 0; i < 100; i++) {
-        volatile uint32_t *fb_ptr = framebuffer->address;
-        fb_ptr[i * (framebuffer->pitch / 4) + i] = 0xffffff;
-    }
+    struct flanterm_context* ft_ctx = flanterm_fb_simple_init(
+        framebuffer->address, framebuffer->width, framebuffer->height, framebuffer->pitch
+    );
+
+    const char msg[] = "Hello world!\n";
+
+    flanterm_write(ft_ctx, msg, sizeof(msg)); 
 
     // We're done, just hang...
-    hcf();
+    while (1) {}
 }
