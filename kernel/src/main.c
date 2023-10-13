@@ -3,6 +3,8 @@
 #include <limine.h>
 #include <flanterm.h>
 #include <backends/fb.h>
+#include "config.h"
+#include "gdt/gdt.h"
 
 // The Limine requests can be placed anywhere, but it is important that
 // the compiler does not optimise them away, so, usually, they should
@@ -78,6 +80,16 @@ static void hcf(void) {
     }
 }
 
+struct gdt gdt[FRAZZOS_TOTAL_SEGMENTS];
+struct gdt_structured gdt_structured[FRAZZOS_TOTAL_SEGMENTS] = {
+    { .access_byte = 0x00, .flags = 0x00 }, // Null Descriptor
+    { .access_byte = 0x9A, .flags = 0xA  }, // Kernel Code
+    { .access_byte = 0x92, .flags = 0xC  }, // Kernel Data
+    { .access_byte = 0xFA, .flags = 0xA  }, // User Code
+    { .access_byte = 0xF2, .flags = 0xC  }, // User Data
+    { .access_byte = 0x89, .flags = 0x00 }  // TSS (Need to implement)
+};
+
 // The following will be our kernel's entry point.
 // If renaming _start() to something else, make sure to change the
 // linker script accordingly.
@@ -93,6 +105,10 @@ void _start(void) {
     struct flanterm_context* ft_ctx = flanterm_fb_simple_init(
         framebuffer->address, framebuffer->width, framebuffer->height, framebuffer->pitch
     );
+
+    gdt_structured_to_real(gdt, gdt_structured, FRAZZOS_TOTAL_SEGMENTS);
+    load_gdt(gdt, sizeof(gdt));
+    load_segment_registers();
 
     const char msg[] = "Hello world!\n";
 
