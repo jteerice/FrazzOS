@@ -106,6 +106,7 @@ void _start(void) {
         framebuffer->address, framebuffer->width, framebuffer->height, framebuffer->pitch
     );
 
+    memset(gdt, 0, sizeof(gdt));
     gdt_structured_to_real(gdt, gdt_structured, FRAZZOS_TOTAL_SEGMENTS);
     load_gdt(gdt, sizeof(gdt));
     load_segment_registers();

@@ -5,12 +5,12 @@
 #include <stddef.h>
 
 struct gdt {
-    uint16_t limit;
-    uint16_t base_low;
-    uint8_t base_mid;
+    uint16_t limit;     // ignored in 64 bit
+    uint16_t base_low;  // ignored
+    uint8_t base_mid;   // ignored
     uint8_t access;
     uint8_t flags;
-    uint8_t base_high;
+    uint8_t base_high;  // ignored
 }__attribute__((packed));
 
 struct gdt_structured {
