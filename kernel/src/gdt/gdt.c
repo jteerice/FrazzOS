@@ -19,7 +19,7 @@ void encode_gdt_entry(uint8_t* target, struct gdt_structured source) {
 
 void gdt_init() {
     memset(gdt, 0, sizeof(gdt));
-    for (size_t i = 0; i < FRAZZOS_TOTAL_SEGMENTS; i++) {
+    for (size_t i = 0; i < FRAZZOS_TOTAL_SEGMENTS - 1; i++) {
         encode_gdt_entry((uint8_t*)&gdt[i], gdt_structured[i]);
     }
     load_gdt(gdt, sizeof(gdt));

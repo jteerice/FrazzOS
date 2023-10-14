@@ -18,6 +18,7 @@ struct gdt_structured {
     uint8_t flags;
 };
 
+void gdt_init();
 void load_gdt(struct gdt* gdt, size_t size);
 void gdt_structured_to_real(struct gdt* gdt, struct gdt_structured* gdt_structured, size_t total);
 void load_segment_registers();

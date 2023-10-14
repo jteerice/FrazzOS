@@ -98,7 +98,7 @@ void _start(void) {
         framebuffer->address, framebuffer->width, framebuffer->height, framebuffer->pitch
     );
 
-    // gdt_init()
+    gdt_init();
 
     const char msg[] = "Hello world!\n";
 
