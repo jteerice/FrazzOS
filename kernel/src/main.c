@@ -5,6 +5,7 @@
 #include <backends/fb.h>
 #include "config.h"
 #include "gdt/gdt.h"
+#include "idt/idt.h"
 
 // The Limine requests can be placed anywhere, but it is important that
 // the compiler does not optimise them away, so, usually, they should
@@ -45,7 +46,9 @@ void _start(void) {
     gdt_init();
     const char msg[] = "[KERNEL] GDT Initialized...\n";
     flanterm_write(ft_ctx, msg, sizeof(msg));
-    //idt_init(); 
+    idt_init(); 
+    const char msg2[] = "Success!\n";
+    flanterm_write(ft_ctx, msg2, sizeof(msg2));
 
     // We're done, just hang...
     while (1) {}

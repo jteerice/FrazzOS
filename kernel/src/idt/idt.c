@@ -4,6 +4,7 @@
 #include <stddef.h>
 
 extern void* isr_stub_table[FRAZZOS_TOTAL_IDT_ENTRIES];
+extern void load_idt(struct idt_entry* idt_entry, int size);
 
 struct idt_entry idt[FRAZZOS_TOTAL_IDT_ENTRIES];
 struct idt_reg idt_reg;
@@ -24,8 +25,8 @@ void idt_init() {
     idt_reg.limit = sizeof(idt) - 1;
     idt_reg.base = (uint64_t)&idt;
 
-    for (uint8_t i; i < FRAZZOS_TOTAL_IDT_ENTRIES; i++) {
-        idt_set_entry(i, isr_stub_table[i], IDT_GATE_INTERRUPT);
+    for (int i = 0; i < FRAZZOS_TOTAL_IDT_ENTRIES; i++) {
+        idt_set_entry((uint8_t)i, isr_stub_table[i], IDT_GATE_INTERRUPT);
     }
 
     load_idt(idt, (sizeof(idt) - 1));
