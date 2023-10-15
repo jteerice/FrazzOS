@@ -44,7 +44,7 @@ void _start(void) {
     );
 
     gdt_init();
-    idt_init(); 
+    idt_init();
 
     // We're done, just hang...
     while (1) {}

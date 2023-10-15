@@ -26,6 +26,12 @@ load_idt:
     sti
     ret
 
+global divide_zero_exception
+extern divide_by_zero_exception_handler
+divide_zero_exception:
+    call divide_by_zero_exception_handler
+    iretq
+
 %macro isr_err_stub 1
 isr_stub_%+%1:
     call general_exception_handler

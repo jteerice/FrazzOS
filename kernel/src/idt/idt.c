@@ -8,6 +8,7 @@
 extern struct flanterm_context* ft_ctx;
 extern void* isr_stub_table[FRAZZOS_TOTAL_IDT_ENTRIES];
 extern void load_idt(struct idt_entry* idt_entry, int size);
+extern void divide_zero_exception();
 
 struct idt_entry idt[FRAZZOS_TOTAL_IDT_ENTRIES];
 struct idt_reg idt_reg;
@@ -32,6 +33,7 @@ void idt_init() {
         idt_set_entry((uint8_t)i, isr_stub_table[i], IDT_GATE_INTERRUPT);
     }
 
+    idt_set_entry(0, divide_zero_exception, IDT_GATE_INTERRUPT);
     load_idt(idt, (sizeof(idt) - 1));
 
     const char msg[] = "[KERNEL] IDT Initialized... Success\n";
