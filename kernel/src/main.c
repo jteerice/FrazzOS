@@ -24,7 +24,7 @@ static void hcf(void) {
     }
 }
 
-
+struct flanterm_context* ft_ctx;
 
 // The following will be our kernel's entry point.
 // If renaming _start() to something else, make sure to change the
@@ -38,15 +38,14 @@ void _start(void) {
     // Fetch the first framebuffer.
     struct limine_framebuffer *framebuffer = framebuffer_request.response->framebuffers[0];
 
-    struct flanterm_context* ft_ctx = flanterm_fb_simple_init(
+    ft_ctx = flanterm_fb_simple_init(
         framebuffer->address, framebuffer->width, framebuffer->height, framebuffer->pitch
     );
 
     gdt_init();
-
-    const char msg[] = "Hello world!\n";
-
-    flanterm_write(ft_ctx, msg, sizeof(msg)); 
+    const char msg[] = "[KERNEL] GDT Initialized...\n";
+    flanterm_write(ft_ctx, msg, sizeof(msg));
+    //idt_init(); 
 
     // We're done, just hang...
     while (1) {}
