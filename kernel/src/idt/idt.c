@@ -2,7 +2,10 @@
 #include "isr.h"
 #include "config.h"
 #include <stddef.h>
+#include <flanterm.h>
+#include <backends/fb.h>
 
+extern struct flanterm_context* ft_ctx;
 extern void* isr_stub_table[FRAZZOS_TOTAL_IDT_ENTRIES];
 extern void load_idt(struct idt_entry* idt_entry, int size);
 
@@ -30,4 +33,7 @@ void idt_init() {
     }
 
     load_idt(idt, (sizeof(idt) - 1));
+
+    const char msg[] = "[KERNEL] IDT Initialized... Success\n";
+    flanterm_write(ft_ctx, msg, sizeof(msg));
 }

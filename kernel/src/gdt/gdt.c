@@ -1,6 +1,10 @@
 #include "gdt.h"
 #include "../config.h"
 #include "../memory/memory.h"
+#include <flanterm.h>
+#include <backends/fb.h>
+
+extern struct flanterm_context* ft_ctx;
 
 struct gdt gdt[FRAZZOS_TOTAL_SEGMENTS];
 struct gdt_structured gdt_structured[FRAZZOS_TOTAL_SEGMENTS] = {
@@ -24,4 +28,7 @@ void gdt_init() {
     }
     load_gdt(gdt, sizeof(gdt));
     load_segment_registers();
+
+    const char msg[] = "[KERNEL] GDT Initialized... Success\n";
+    flanterm_write(ft_ctx, msg, sizeof(msg));
 }
