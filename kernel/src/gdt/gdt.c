@@ -21,6 +21,8 @@ void encode_gdt_entry(uint8_t* target, struct gdt_structured source) {
 }
 
 void gdt_init() {
+    kprint("[KERNEL] GDT Initializing... ");
+
     memset(gdt, 0, sizeof(gdt));
     for (size_t i = 0; i < FRAZZOS_TOTAL_SEGMENTS - 1; i++) {
         encode_gdt_entry((uint8_t*)&gdt[i], gdt_structured[i]);
@@ -28,5 +30,5 @@ void gdt_init() {
     load_gdt(gdt, sizeof(gdt));
     load_segment_registers();
 
-    kprint("[KERNEL] GDT Initialized... Success\n");
+    kprint("Success\n");
 }

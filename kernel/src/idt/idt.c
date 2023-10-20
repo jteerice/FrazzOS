@@ -24,6 +24,8 @@ void idt_set_entry(uint8_t interrupt_code, void* interrupt_routine, uint8_t flag
 }
 
 void idt_init() {
+    kprint("[KERNEL] IDT Initializing... ");
+
     idt_reg.limit = sizeof(idt) - 1;
     idt_reg.base = (uint64_t)&idt;
 
@@ -34,5 +36,5 @@ void idt_init() {
     idt_set_entry(0, divide_zero_exception, IDT_GATE_INTERRUPT);
     load_idt(idt, (sizeof(idt) - 1));
 
-    kprint("[KERNEL] IDT Initialized... Success\n");
+    kprint("Success\n");
 }
