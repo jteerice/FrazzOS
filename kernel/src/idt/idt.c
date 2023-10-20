@@ -1,11 +1,9 @@
 #include "idt.h"
 #include "isr.h"
 #include "config.h"
+#include "klibc/io.h"
 #include <stddef.h>
-#include <flanterm.h>
-#include <backends/fb.h>
 
-extern struct flanterm_context* ft_ctx;
 extern void* isr_stub_table[FRAZZOS_TOTAL_IDT_ENTRIES];
 extern void load_idt(struct idt_entry* idt_entry, int size);
 extern void divide_zero_exception();
@@ -36,6 +34,5 @@ void idt_init() {
     idt_set_entry(0, divide_zero_exception, IDT_GATE_INTERRUPT);
     load_idt(idt, (sizeof(idt) - 1));
 
-    const char msg[] = "[KERNEL] IDT Initialized... Success\n";
-    flanterm_write(ft_ctx, msg, sizeof(msg));
+    kprint("[KERNEL] IDT Initialized... Success\n");
 }
