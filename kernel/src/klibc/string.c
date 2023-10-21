@@ -9,7 +9,7 @@ int strlen(const char* str) {
 }
 
 char* ull_to_hex(char* buf, uint64_t num) {
-    static char chars[] = "0123456789abcdefghijklmnopqrstuvwxyz";
+    static char alpha_numeric[] = "0123456789abcdefghijklmnopqrstuvwxyz";
     memset(buf, 48, HEX_STRING_MAX);
     buf[0] = '0';
     buf[1] = 'x';
@@ -18,10 +18,24 @@ char* ull_to_hex(char* buf, uint64_t num) {
     char* str = &buf[HEX_STRING_MAX - 1];
 
     while (num) {
-        *--str = chars[num % HEX_BASE];
+        *--str = alpha_numeric[num % HEX_BASE];
         num /= HEX_BASE;
     }
 
     return buf;
+}
+
+char* itoa(char* buf, uint64_t num) {
+    static char numeric[] = "0123456789";
+    buf[MAX_NUM_STRING_LEN] = 0;
+    
+    char* str = &buf[MAX_NUM_STRING_LEN - 1];
+
+    while (num) {
+        *--str = numeric[num % BASE_10];
+        num /= BASE_10;   
+    }
+
+    return str;
 }
 

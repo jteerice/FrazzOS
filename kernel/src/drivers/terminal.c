@@ -28,4 +28,13 @@ void terminal_init() {
         framebuffer->address, framebuffer->width, framebuffer->height, framebuffer->pitch
     );
 
+    const char msg1[] = "-----------------------------------------------------------------------------------------------------------------\n";
+    const char msg2[] = "                                                                                                                 \n";
+    const char msg3[] = "Kernel Booted -- Welcome to FrazzOS 64-bit!\n";
+
+    flanterm_write(ft_ctx, msg1, sizeof(msg1));
+    flanterm_write(ft_ctx, msg2, sizeof(msg2));
+    flanterm_write(ft_ctx, msg3, sizeof(msg3));
+    flanterm_write(ft_ctx, msg2, sizeof(msg2));
+    flanterm_write(ft_ctx, msg1, sizeof(msg1));
 }
