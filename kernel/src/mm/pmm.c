@@ -149,8 +149,8 @@ void pmm_init() {
         if (entries[i]->type == LIMINE_MEMMAP_USABLE) {
             if (entries[i]->length >= bitmap.size) {
                 bitmap.map = (uint64_t*)phys_to_hh(entries[i]->base);
-                entries[i]->base += bitmap.size;
-                entries[i]->length -= bitmap.size;
+                //entries[i]->base += bitmap.size;
+                //entries[i]->length -= bitmap.size;
             }
         }
     }
@@ -163,6 +163,7 @@ void pmm_init() {
         }
     }
 
+    pmm_reserve(*bitmap.map, bitmap.size * 8);
     pmm_reserve(0, 0x100000);
 
     kprint("\n[KERNEL] PMM Initialized... Success\n");
