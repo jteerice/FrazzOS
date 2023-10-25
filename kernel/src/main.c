@@ -1,5 +1,5 @@
 #include "gdt/gdt.h"
-#include "mem/pmm.h"
+#include "mm/pmm.h"
 #include "idt/idt.h"
 #include "drivers/terminal.h"
 
