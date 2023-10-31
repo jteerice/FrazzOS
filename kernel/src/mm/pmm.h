@@ -24,5 +24,6 @@ struct bitmap {
 }__attribute((packed));
 
 void pmm_init();
+void* pmm_alloc();
 
 #endif

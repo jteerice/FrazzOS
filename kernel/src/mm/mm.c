@@ -15,11 +15,3 @@ uint64_t align_down(uint64_t addr) {
 
     return addr - (addr % PAGE_SIZE);
 }
-
-inline uint64_t phys_to_hh(uint64_t addr) {
-    return addr + KERNEL_VIRT_BASE_ADDR;
-}
-
-inline uint64_t hh_to_phys(uint64_t addr) {
-    return addr - KERNEL_VIRT_BASE_ADDR;
-}

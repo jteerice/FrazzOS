@@ -1,4 +1,5 @@
 #include "gdt/gdt.h"
+#include "mm/vmm.h"
 #include "mm/pmm.h"
 #include "idt/idt.h"
 #include "drivers/terminal.h"
@@ -10,6 +11,7 @@ void _start(void) {
     gdt_init();
     idt_init();
     pmm_init();
+    vmm_init();
 
     // We're done, just hang...
     while (1) {}

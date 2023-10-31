@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#define HEX_STRING_MAX 19
+#define HEX_STRING_MAX 18
 #define HEX_BASE 16
 #define MAX_NUM_STRING_LEN 50
 #define BASE_10 10

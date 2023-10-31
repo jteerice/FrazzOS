@@ -31,6 +31,10 @@ all: $(IMAGE_NAME).iso
 .PHONY: all-hdd
 all-hdd: $(IMAGE_NAME).hdd
 
+.PHONY: run-dump
+run-dump: $(IMAGE_NAME).iso
+	qemu-system-x86_64 -d int -M q35 -m 2G -cdrom $(IMAGE_NAME).iso -boot d
+
 .PHONY: run
 run: $(IMAGE_NAME).iso
 	qemu-system-x86_64 -M q35 -m 2G -cdrom $(IMAGE_NAME).iso -boot d

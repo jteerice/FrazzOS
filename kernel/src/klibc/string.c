@@ -15,7 +15,7 @@ char* ull_to_hex(char* buf, uint64_t num) {
     buf[1] = 'x';
     buf[HEX_STRING_MAX] = 0;
 
-    char* str = &buf[HEX_STRING_MAX - 1];
+    char* str = &buf[HEX_STRING_MAX];
 
     while (num) {
         *--str = alpha_numeric[num % HEX_BASE];

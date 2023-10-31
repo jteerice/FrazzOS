@@ -138,6 +138,42 @@ static inline bool bitmap_test_bit(uint64_t idx) {
     return bitmap.map[idx / BITS_PER_BLOCK] & (1 << (idx % BITS_PER_BLOCK));
 }
 
+static int pmm_first_free() {
+    for (uint64_t i = 0; i < pmm_info.total_pages / BITS_PER_BLOCK; i++) {
+        if (bitmap.map[i] != 0xFFFFFFFFFFFFFFFF) {
+            for (int j = 0; j < BITS_PER_BLOCK; j++) {
+                if (!(bitmap.map[i] & (1 << j))) {
+                    return i * BITS_PER_BLOCK + j;
+                }
+            }
+        }
+    }
+    return ENOMEM;
+}
+
+void pmm_free_page(void* addr) {
+    bitmap_clear_bit((uint64_t)addr / PAGE_SIZE);
+    pmm_info.available_pages++;
+    pmm_info.used_pages--;
+}
+
+void* pmm_alloc() {
+    if (pmm_info.available_pages <= 0) {
+        return (void*)ENOMEM;
+    }
+    uint64_t page_frame = pmm_first_free();
+
+    if ((int)page_frame == -1) {
+        return (void*)ENOMEM;
+    }
+
+    bitmap_set_bit(page_frame);
+    pmm_info.available_pages--;
+    pmm_info.used_pages++;
+
+    return (void*)(uint64_t)(phys_to_hh(page_frame * PAGE_SIZE));
+}
+
 void pmm_init() {
     int num_entries = memmap_request.response->entry_count;
     struct limine_memmap_entry** entries = memmap_request.response->entries;
@@ -149,8 +185,6 @@ void pmm_init() {
         if (entries[i]->type == LIMINE_MEMMAP_USABLE) {
             if (entries[i]->length >= bitmap.size) {
                 bitmap.map = (uint64_t*)phys_to_hh(entries[i]->base);
-                //entries[i]->base += bitmap.size;
-                //entries[i]->length -= bitmap.size;
             }
         }
     }
