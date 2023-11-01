@@ -5,6 +5,8 @@
 #include "klibc/io.h"
 #include "klibc/string.h"
 
+extern struct limine_kernel_address_response* response;
+
 static uint64_t *root_page_dir;
 
 static uint64_t *vmm_get_next_map_level(uint64_t *page_directory, uintptr_t index, int flags) {
@@ -74,7 +76,7 @@ void vmm_init() {
     root_page_dir = vmm_new_page_dir();
     
     // Identity map first 4 GB
-    for (uint64_t i = 0; i < 4 * GIGABYTE; i += PAGE_SIZE) {
+    for (uint64_t i = 0x1000; i < 4 * GIGABYTE; i += PAGE_SIZE) {
         vmm_map_page(root_page_dir, i, i, PTE_PRESENT | PTE_READ_WRITE);
     } 
 
@@ -87,14 +89,14 @@ void vmm_init() {
 
     kprint("[KERNEL] 2/3 Direct Map First 4GB to 0xffff800000000000\n");
 
-    // Memory protected regions
-    for (uint64_t i = 0; i < 0x80000000; i += PAGE_SIZE) {
-        vmm_map_page(root_page_dir, i, phys_to_hh_code(i), PTE_PRESENT);
+    // Map kernel code
+    for (uint64_t i = 0; i < 4 * GIGABYTE; i += PAGE_SIZE) {
+        vmm_map_page(root_page_dir, response->physical_base + i, KERNEL_VIRT_TOP_ADDR + i, PTE_PRESENT | PTE_READ_WRITE); 
     }
 
-    kprint("[KERNEL] 3/3 Mapped memory protected region\n");
+    kprint("[KERNEL] 3/3 Kernel Code Mapped\n");
 
-    vmm_activate_page_directory(root_page_dir);
+    vmm_activate_page_directory(root_page_dir); 
 
     kprint("[KERNEL] VMM Initialized... Success\n");
 }

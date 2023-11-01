@@ -23,6 +23,8 @@ static volatile struct limine_hhdm_request hhdm_request = {
     .revision = 0
 };
 
+struct limine_kernel_address_response* response;
+
 static void print_mem_map(int num_entries, struct limine_memmap_entry** entries) {
     char hex_addr[HEX_STRING_MAX];
     kprint("\nPhysical Memory Regions:\n\n");
@@ -82,7 +84,7 @@ static uint64_t get_total_memory(int num_entries, struct limine_memmap_entry** e
 
 static void print_kernel_base_addresses() {
     char hex_addr[HEX_STRING_MAX];
-    struct limine_kernel_address_response* response = kernel_address_request.response;
+    response = kernel_address_request.response;
     kprint("The physical base address of the kernel is: ");
     kprint(ull_to_hex(hex_addr, response->physical_base));
     kprint("\nThe virtual base address of the kernel is:  ");
