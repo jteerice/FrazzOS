@@ -141,7 +141,17 @@ static inline bool bitmap_test_bit(uint64_t idx) {
 }
 
 static int pmm_first_free(uint64_t start) {
-    for (uint64_t i = start; i < pmm_info.total_pages / BITS_PER_BLOCK; i++) {
+    int start_block = start / BITS_PER_BLOCK;
+    if (start % BITS_PER_BLOCK != 0) {
+        int start_bit = start % BITS_PER_BLOCK;
+        for (int i = start_bit; i < BITS_PER_BLOCK; i++) {
+            if (!(bitmap.map[start_block] & (1 << i))) {
+                return start_block * BITS_PER_BLOCK + i; 
+            }
+        } 
+        start_block++;
+    }
+    for (uint64_t i = start_block; i < pmm_info.total_pages / BITS_PER_BLOCK; i++) {
         if (bitmap.map[i] != 0xFFFFFFFFFFFFFFFF) {
             for (int j = 0; j < BITS_PER_BLOCK; j++) {
                 if (!(bitmap.map[i] & (1 << j))) {
@@ -180,7 +190,7 @@ void* pmm_alloc(uint64_t size) {
     do {
         start_idx = check_region_size(page_frame, num_pages);
         if (start_idx != 0) {
-            page_frame = pmm_first_free((start_idx / BITS_PER_BLOCK) + 1);
+            page_frame = pmm_first_free(start_idx);
         } else {
             break;
         }
