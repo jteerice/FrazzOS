@@ -140,8 +140,8 @@ static inline bool bitmap_test_bit(uint64_t idx) {
     return bitmap.map[idx / BITS_PER_BLOCK] & (1 << (idx % BITS_PER_BLOCK));
 }
 
-static int pmm_first_free() {
-    for (uint64_t i = 0; i < pmm_info.total_pages / BITS_PER_BLOCK; i++) {
+static int pmm_first_free(uint64_t start) {
+    for (uint64_t i = start; i < pmm_info.total_pages / BITS_PER_BLOCK; i++) {
         if (bitmap.map[i] != 0xFFFFFFFFFFFFFFFF) {
             for (int j = 0; j < BITS_PER_BLOCK; j++) {
                 if (!(bitmap.map[i] & (1 << j))) {
@@ -159,19 +159,43 @@ void pmm_free_page(void* addr) {
     pmm_info.used_pages--;
 }
 
-void* pmm_alloc() {
+static int check_region_size(uint64_t start, int count) {
+    for (uint64_t i = 0; i < (uint64_t)count; i++) {
+        if (bitmap_test_bit(start + i)) {
+            return start + i;
+        }
+    }
+    return 0;
+}
+
+void* pmm_alloc(uint64_t size) {
     if (pmm_info.available_pages <= 0) {
         return (void*)ENOMEM;
     }
-    uint64_t page_frame = pmm_first_free();
+
+    int start_idx;
+    int num_pages = align_up(size) / PAGE_SIZE;
+    int64_t page_frame = pmm_first_free(0);
+
+    do {
+        start_idx = check_region_size(page_frame, num_pages);
+        if (start_idx != 0) {
+            page_frame = pmm_first_free((start_idx / BITS_PER_BLOCK) + 1);
+        } else {
+            break;
+        }
+    } while (page_frame >= 0);
 
     if ((int)page_frame == -1) {
         return (void*)ENOMEM;
     }
 
-    bitmap_set_bit(page_frame);
-    pmm_info.available_pages--;
-    pmm_info.used_pages++;
+    for (uint64_t i = page_frame; i < ((uint64_t)num_pages + page_frame); i++) {
+        bitmap_set_bit(i);
+    }
+
+    pmm_info.available_pages -= num_pages;
+    pmm_info.used_pages += num_pages;
 
     return (void*)(uint64_t)(phys_to_hh(page_frame * PAGE_SIZE));
 }

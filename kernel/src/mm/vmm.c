@@ -13,7 +13,7 @@ static uint64_t *vmm_get_next_map_level(uint64_t *page_directory, uintptr_t inde
     if (page_directory[index] & 1) {
         return (uint64_t *)(page_directory[index] & ~(INDEX_MASK));
     } else {
-        page_directory[index] = hh_to_phys((uint64_t)pmm_alloc(1)) | flags;
+        page_directory[index] = hh_to_phys((uint64_t)pmm_alloc(PAGE_SIZE)) | flags;
         return (uint64_t *)(page_directory[index] & ~(INDEX_MASK));
     }
 }
@@ -63,7 +63,7 @@ void vmm_unmap_page(uint64_t *root_page_dir, uintptr_t virt_addr) {
 }
 
 uint64_t *vmm_new_page_dir() {
-    uint64_t *new_page_dir = pmm_alloc();
+    uint64_t *new_page_dir = pmm_alloc(PAGE_SIZE);
     memset((void*)hh_to_phys((uint64_t)new_page_dir), 0, PAGE_SIZE);
     return new_page_dir;
 }
@@ -74,7 +74,7 @@ void vmm_activate_page_directory(uint64_t *current_page_directory) {
 
 void vmm_init() {
     root_page_dir = vmm_new_page_dir();
-    
+
     // Identity map first 4 GB
     for (uint64_t i = 0x1000; i < 4 * GIGABYTE; i += PAGE_SIZE) {
         vmm_map_page(root_page_dir, i, i, PTE_PRESENT | PTE_READ_WRITE);
