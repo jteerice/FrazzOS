@@ -7,7 +7,7 @@
 
 extern struct limine_kernel_address_response* response;
 
-static uint64_t *root_page_dir;
+uint64_t *root_page_dir;
 
 static uint64_t *vmm_get_next_map_level(uint64_t *page_directory, uintptr_t index, int flags) {
     if (page_directory[index] & 1) {
