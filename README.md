@@ -1,27 +1,33 @@
-# Limine Bare Bones
+# FrazzOS
+This is a 64-bit monolithic kernel that utilizes [Limine bootloader](https://github.com/limine-bootloader/limine).
 
-This repository will demonstrate how to set up a basic x86-64 kernel using Limine.
+### Building
+Building this project requires a cross-compiler for x64. A great resource for creating a cross-compiler for x64 can be found [here](https://wiki.osdev.org/GCC_Cross-Compiler).
 
-It is recommended to cross reference the contents of this repository with [the Limine Bare Bones](https://wiki.osdev.org/Limine_Bare_Bones) OSDev wiki page.
+```make all```: Compile the kernel and create an ISO image.
+```make all-hdd```: Compile the kernel and generate a raw image that can be flashed onto hardware.
+```make run``` Compile an ISO image and run it with ```qemu```.
+```make run-hdd``` Compile a raw image and run it with ```qemu```.
 
-## How to use this?
+### Features
+- [X] Limine Barebones
+- [X] Global Descriptor Table
+- [X] Interrupt Descriptor Table
+- [ ] SIMD
+- [X] Physical Memory Manager
+- [X] Virtual Memory Manager
+- [X] Paging
+- [X] Heap Memory Manager
+- [ ] ACPI
+- [ ] APIC
+- [ ] IOAPIC
+- [ ] LAPIC
+- [ ] HPET
+- [ ] APIC-TIMER
+- [ ] SMP
+- [ ] Multitasking
+- [ ] Syscalls
+- [ ] Userspace
+- [ ] ACPI
 
-### Dependencies
 
-Any `make` command depends on GNU make (`gmake`) and is expected to be run using it. This usually means using `make` on most GNU/Linux distros, or `gmake` on other non-GNU systems.
-
-All `make all*` targets depend on a GNU-compatible C toolchain capable of generating x86-64 ELF objects. Usually `gcc/binutils` or `clang/llvm/lld` provided by any x86-64 UNIX like (including Linux) distribution will suffice.
-
-Additionally, building an ISO with `make all` requires `xorriso`, and building a HDD/USB image with `make all-hdd` requires `sgdisk` (usually from `gdisk` or `gptfdisk` packages) and `mtools`.
-
-### Makefile targets
-
-Running `make all` will compile the kernel (from the `kernel/` directory) and then generate a bootable ISO image.
-
-Running `make all-hdd` will compile the kernel and then generate a raw image suitable to be flashed onto a USB stick or hard drive/SSD.
-
-Running `make run` will build the kernel and a bootable ISO (equivalent to make all) and then run it using `qemu` (if installed).
-
-Running `make run-hdd` will build the kernel and a raw HDD image (equivalent to make all-hdd) and then run it using `qemu` (if installed).
-
-The `run-uefi` and `run-hdd-uefi` targets are equivalent to their non `-uefi` counterparts except that they boot `qemu` using a UEFI-compatible firmware.
