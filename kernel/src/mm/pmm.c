@@ -4,6 +4,7 @@
 #include "klibc/string.h"
 #include "klibc/io.h"
 #include "klibc/memory.h"
+#include "klibc/bitmap.h"
 
 volatile struct bitmap bitmap;
 struct pmm_info pmm_info;
@@ -116,27 +117,27 @@ static void print_memory_stats(int num_entries, struct limine_memmap_entry** ent
     kprint("\n");
 }
 
-static inline void bitmap_clear_bit(uint64_t idx) {
+static inline void pmm_bitmap_clear_bit(uint64_t idx) {
     bitmap.map[idx / BITS_PER_BLOCK] &= ~(1 << (idx % BITS_PER_BLOCK));
 }
 
 static void pmm_free(uint64_t addr, uint64_t len) {
     for (uint64_t i = addr / PAGE_SIZE; i <  ((addr + len) / PAGE_SIZE) + (len % PAGE_SIZE ? 1 : 0); i++) {
-        bitmap_clear_bit(i);
+        pmm_bitmap_clear_bit(i);
     }
 }
 
-static inline void bitmap_set_bit(uint64_t idx) {
+static inline void pmm_bitmap_set_bit(uint64_t idx) {
     bitmap.map[idx / BITS_PER_BLOCK] |= (1 << (idx % BITS_PER_BLOCK));
 }
 
 static void pmm_reserve(uint64_t addr, uint64_t len) {
     for (uint64_t i = addr / PAGE_SIZE; i <  ((addr + len) / PAGE_SIZE) + (len % PAGE_SIZE ? 1 : 0); i++) {
-        bitmap_set_bit(i);
+        pmm_bitmap_set_bit(i);
     }
 }
 
-static inline bool bitmap_test_bit(uint64_t idx) {
+static inline bool pmm_bitmap_test_bit(uint64_t idx) {
     return bitmap.map[idx / BITS_PER_BLOCK] & (1 << (idx % BITS_PER_BLOCK));
 }
 
@@ -164,14 +165,14 @@ static int pmm_first_free(uint64_t start) {
 }
 
 void pmm_free_page(void* addr) {
-    bitmap_clear_bit((uint64_t)addr / PAGE_SIZE);
+    pmm_bitmap_clear_bit((uint64_t)addr / PAGE_SIZE);
     pmm_info.available_pages++;
     pmm_info.used_pages--;
 }
 
 static int check_region_size(uint64_t start, int count) {
     for (uint64_t i = 0; i < (uint64_t)count; i++) {
-        if (bitmap_test_bit(start + i)) {
+        if (pmm_bitmap_test_bit(start + i)) {
             return start + i;
         }
     }
@@ -201,7 +202,7 @@ void* pmm_alloc(uint64_t size) {
     }
 
     for (uint64_t i = page_frame; i < ((uint64_t)num_pages + page_frame); i++) {
-        bitmap_set_bit(i);
+        pmm_bitmap_set_bit(i);
     }
 
     pmm_info.available_pages -= num_pages;

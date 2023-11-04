@@ -2,27 +2,31 @@
 #include "mm/mm.h"
 #include "mm/heap.h"
 #include "status.h"
+#include "bitmap.h"
 
 extern struct heap heap;
 
-int first_free_byte(int start) {
-    for (uint64_t i = start; i < heap.size / BITS_PER_BLOCK; i++) {
-        if (heap.map[i] != 0xFFFFFFFFFFFFFFFF) {
-            for (int j = 0; j < BITS_PER_BLOCK; j++) {
-                if (!(heap.map[i] & (1 << j))) {
-                    return i * BITS_PER_BLOCK + j;
-                }
-            }
-        }
-    }
-    return -1;
-}
-
 void* malloc(uint64_t size) {
-    int start = first_free_byte(0);
-    while (start >= 0) {
-        if (is_free_region_big_enough(start, size)) {
-            start = first_free_byte(start);
+    uint64_t buffer_long_size = heap.size / BYTES_PER_LONG;
+    int start = find_first_free(0, heap.map, buffer_long_size);
+
+    do {
+        if (is_free_region_big_enough(start, heap.map, size)) {
+            start = find_first_free(start, heap.map, buffer_long_size);
+        } else {
+            break;
         }
+    } while (start >= 0);
+
+    if (start == -1) {
+        return (void*)ENOMEM;
     }
+
+    for (uint64_t i = start; i < (uint64_t)(start + (size / BITS_PER_BLOCK)); i++) {
+        bitmap_set_bit(i, heap.map);
+    }
+
+    heap.available_bytes -= size;
+
+    return (void*)(FRAZZOS_HEAP_START_ADDR + start);
 }

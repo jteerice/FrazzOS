@@ -4,6 +4,7 @@
 #include "idt/idt.h"
 #include "drivers/terminal.h"
 #include "mm/heap.h"
+#include "firmware/acpi.h"
 
 // linker script accordingly.
 void _start(void) {
@@ -14,6 +15,7 @@ void _start(void) {
     pmm_init();
     vmm_init();
     heap_init();
+    acpi_init();
 
     // We're done, just hang...
     while (1) {}
