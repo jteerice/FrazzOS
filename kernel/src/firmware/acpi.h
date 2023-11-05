@@ -8,6 +8,15 @@
 
 #define CHECKSUM_VALIDATE_SIZE 20
 #define SDT_SIG_LEN 4
+#define ACPI_APIC_TBL_SIZE 256
+
+#define PROCESSOR_LOCAL_APIC 0
+#define IO_APIC 1
+#define IO_APIC_INTERRUPT_SRC_OVERRIDE 2
+#define IO_APIC_NMI_SRC 3
+#define LOCAL_APIC_NMI 4
+#define LOCAL_APIC_ADDR_OVERRIDE 5
+#define PROCESSOR_LOCAL_X2_APIC 9
 
 struct rsdp_t {
     char signature[8];
@@ -38,7 +47,7 @@ struct rsdt_t {
     uint32_t entries[];
 }__attribute__((packed));
 
-struct madt_tbl_entry {
+struct madt_tbl_entry_t {
     uint8_t type;
     uint8_t length;
 }__attribute__((packed));
@@ -47,8 +56,60 @@ struct madt_t {
     struct acpi_sdt_header header;
     uint32_t lapic_addr;
     uint32_t flags;
-    struct madt_tbl_entry_t* table;
+    struct madt_tbl_entry_t table[];
 }__attribute((packed));
+
+struct proc_lapic_t {
+    struct madt_tbl_entry_t record;
+    uint8_t proc_id;
+    uint8_t apic_id;
+    uint32_t flags;
+}__attribute((packed));
+
+struct io_apic_t {
+    struct madt_tbl_entry_t record;
+    uint8_t io_apic_id;
+    uint8_t reserved;
+    uint32_t io_apic_addr;
+    uint32_t gsib;
+}__attribute((packed));
+
+struct ioso_apic_t {
+    struct madt_tbl_entry_t record;
+    uint8_t bus;
+    uint8_t irq;
+    uint32_t gsi;
+    short flags;
+}__attribute__((packed));
+
+struct ionmi_apic_t {
+    struct madt_tbl_entry_t record;
+    uint8_t nmi;
+    uint8_t reserved;
+    short flags;
+    uint32_t gsi;
+}__attribute__((packed));
+
+struct nmi_lapic_t {
+    struct madt_tbl_entry_t record;
+    uint8_t proc_id;
+    short flags;
+    uint8_t lint;
+}__attribute__((packed));
+
+struct addro_lapic_t {
+    struct madt_tbl_entry_t record;
+    short reserved;
+    uint64_t lapic_addr;
+}__attribute__((packed));
+
+struct procx2_lapic_t {
+    struct madt_tbl_entry_t record;
+    short reserved;
+    uint32_t x2_lapic_id;
+    uint32_t flags;
+    uint32_t apic_id;
+}__attribute__((packed));
 
 void acpi_init();
 

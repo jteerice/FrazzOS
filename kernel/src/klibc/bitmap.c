@@ -1,6 +1,7 @@
 #include "bitmap.h"
 #include "mm/mm.h"
 #include "status.h"
+#include "string.h"
 
 void bitmap_set_bit(uint64_t idx, uint64_t* buffer) {
     buffer[idx / BITS_PER_BLOCK] |= (1 << (idx % BITS_PER_BLOCK));
