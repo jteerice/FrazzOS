@@ -89,13 +89,9 @@ void acpi_init() {
     } else {
         rsdt = (struct rsdt_t*)(uintptr_t)phys_to_hh((uintptr_t)rsdp->rsdt_addr);
         char buf[HEX_STRING_MAX];
-        kprint("rsdt phys addr: ");
-        kprint(ull_to_hex(buf, (uint64_t)rsdp->rsdt_addr));
-        kprint("\n");
         for (uint64_t i = 0; i < rsdt->header.length; i++) {
             vmm_map_page(root_page_dir, (uint64_t)rsdp->rsdt_addr + i, (uint64_t)rsdt + i, PTE_PRESENT | PTE_READ_WRITE);
         }
-        //vmm_map_page(root_page_dir, (uint64_t)rsdp->rsdt_addr, (uint64_t)rsdt, PTE_PRESENT | PTE_READ_WRITE);
         if (!sdt_validate_sig(&rsdt->header, "RSDT") || !sdt_validate_checksum(&rsdt->header)) {
             kprint("[[[PANIC]]] RSDT INVALID\n");
             for (;;) {
