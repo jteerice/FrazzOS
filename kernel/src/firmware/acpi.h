@@ -4,6 +4,7 @@
 #include <limine.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include "mm/vmm.h"
 
 #define CHECKSUM_VALIDATE_SIZE 20
 #define SDT_SIG_LEN 4
@@ -34,7 +35,7 @@ struct acpi_sdt_header {
 
 struct rsdt_t {
     struct acpi_sdt_header header;
-    uint32_t* entries;
+    uint32_t entries[];
 }__attribute__((packed));
 
 struct madt_tbl_entry {

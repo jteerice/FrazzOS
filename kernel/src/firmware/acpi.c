@@ -3,6 +3,9 @@
 #include "mm/mm.h"
 #include "klibc/memory.h"
 #include "klibc/string.h"
+#include "mm/vmm.h"
+
+extern uint64_t* root_page_dir;
 
 static struct rsdp_t* rsdp;
 static struct rsdt_t* rsdt;
@@ -27,21 +30,22 @@ static bool rsdp_validate_checksum(void* rsdp) {
     return true;
 }
 
-static bool sdt_validate_checksum(struct acpi_sdt_header* sdt_header) {
-    int sum = 0;
-    uint8_t* ptr = (uint8_t*)sdt_header;
-    for (int i = 0; i < (int)sdt_header->length; i++) {
-        sum += ptr[i];
-    }
-
-    if (sum % 100 == 0) {
+static bool sdt_validate_sig(struct acpi_sdt_header* header, const char* sig) {
+    if (!memcmp(header->signature, sig, SDT_SIG_LEN)) {
         return true;
     }
     return false;
 }
 
-static bool sdt_validate(struct acpi_sdt_header* sdt_header, const char* sig) {
-    if (sdt_validate_checksum(sdt_header)) {
+static bool sdt_validate_checksum(struct acpi_sdt_header* header) {
+    uint8_t sum = 0;
+    uint8_t* ptr = (uint8_t*)header;
+
+    for (uint32_t i = 0; i < header->length; i++) {
+        sum += ptr[i];
+    }
+
+    if ((sum & 0xFF) == 0) {
         return true;
     }
     return false;
@@ -50,10 +54,10 @@ static bool sdt_validate(struct acpi_sdt_header* sdt_header, const char* sig) {
 struct acpi_sdt_header* acpi_find_sdt_tbl(const char* sig) {
     uint64_t num_entries = (rsdt->header.length - sizeof(rsdt->header)) / (acpi_version_2 ? 8 : 4);
     struct acpi_sdt_header* entry;
-
+    char buf[HEX_STRING_MAX];
     for (uint64_t i = 0; i < num_entries; i++) {
-        entry = (struct acpi_sdt_header*)(uintptr_t)rsdt->entries[i];
-        if (!sdt_validate(entry, sig)) {
+        entry = (struct acpi_sdt_header*)phys_to_hh(((uintptr_t)rsdt->entries[i]));
+        if (sdt_validate_sig(entry, sig) && sdt_validate_checksum(entry)) {
             return (struct acpi_sdt_header*)phys_to_hh((uintptr_t)entry);
         }
     }
@@ -78,21 +82,28 @@ void acpi_init() {
             asm ("hlt");
         }
     }
-    
-    rsdp = (struct rsdp_t*)rsdp_request.response[0].address;
+
+    rsdp = (struct rsdp_t*)(uintptr_t)rsdp_request.response[0].address;
     if (rsdp->revision >= 2) {
         acpi_version_2 = true;
-        kprint("ACPI Version 2 being used!\n");
     } else {
-        rsdt = (struct rsdt_t*)(uintptr_t)rsdp->rsdt_addr;
-        if (!sdt_validate(&rsdt->header, "RSDT")) {
-            kprint("[[[PANIC]]] NO ACPI FOUND ON COMPUTER\n");
+        rsdt = (struct rsdt_t*)(uintptr_t)phys_to_hh((uintptr_t)rsdp->rsdt_addr);
+        char buf[HEX_STRING_MAX];
+        kprint("rsdt phys addr: ");
+        kprint(ull_to_hex(buf, (uint64_t)rsdp->rsdt_addr));
+        kprint("\n");
+        for (uint64_t i = 0; i < rsdt->header.length; i++) {
+            vmm_map_page(root_page_dir, (uint64_t)rsdp->rsdt_addr + i, (uint64_t)rsdt + i, PTE_PRESENT | PTE_READ_WRITE);
+        }
+        //vmm_map_page(root_page_dir, (uint64_t)rsdp->rsdt_addr, (uint64_t)rsdt, PTE_PRESENT | PTE_READ_WRITE);
+        if (!sdt_validate_sig(&rsdt->header, "RSDT") || !sdt_validate_checksum(&rsdt->header)) {
+            kprint("[[[PANIC]]] RSDT INVALID\n");
             for (;;) {
                 asm ("hlt");
             }
         }
     }
 
-    //madt_init();
+    madt_init();
     kprint("Success\n");
 }
