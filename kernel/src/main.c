@@ -18,7 +18,7 @@ void _start(void) {
     pmm_init();
     vmm_init();
     heap_init();
-    //acpi_init();
+    acpi_init();
 
     // We're done, just hang...
     while (1) {}

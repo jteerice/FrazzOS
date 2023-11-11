@@ -89,14 +89,7 @@ static void madt_init() {
         }
     }
 
-    char buf[HEX_STRING_MAX];
     proc_apic_tbl    = malloc(ACPI_APIC_TBL_SIZE);
-    kprint("proc apic tbl @ ");
-    kprint(ull_to_hex(buf, (uint64_t)proc_apic_tbl));
-    kprint("\n");
-    kprint("proc apic idx = ");
-    kprint(ull_to_hex(buf, (uint64_t)proc_apic_idx));
-    kprint("\n");
     io_apic_tbl      = malloc(ACPI_APIC_TBL_SIZE);
     ioso_apic_tbl    = malloc(ACPI_APIC_TBL_SIZE);
     ionmi_apic_tbl   = malloc(ACPI_APIC_TBL_SIZE);
@@ -104,43 +97,33 @@ static void madt_init() {
     addro_lapic_tbl  = malloc(ACPI_APIC_TBL_SIZE);
     procx2_lapic_tbl = malloc(ACPI_APIC_TBL_SIZE);
 
-    uint64_t max_madt_addr = (uint64_t)(&madt->header + madt->header.length);
+    uint8_t* max_madt_addr = (uint8_t*)&madt->header + madt->header.length;
     uint8_t* ptr = (uint8_t*)&madt->table;
-    while ((uint64_t)ptr < max_madt_addr) {
-        switch(*ptr) {
+    while (ptr < max_madt_addr) {
+        switch(*ptr) {             
             case PROCESSOR_LOCAL_APIC:
-                kprint("a\n");
-                proc_apic_tbl[proc_apic_idx++] = (struct proc_apic_t*)1;
-                //proc_apic_tbl[proc_apic_idx++] = (struct proc_apic_t*)ptr;
-                kprint("fucked!\n");
+                proc_apic_tbl[proc_apic_idx++] = (struct proc_apic_t*)ptr;
                 break;
             case IO_APIC:
-                kprint("b\n");
                 io_apic_tbl[io_apic_idx++] = (struct io_apic_t*)ptr;
                 break;
             case IO_APIC_INTERRUPT_SRC_OVERRIDE:
-                kprint("c\n");
                 ioso_apic_tbl[ioso_apic_idx++] = (struct ioso_apic_t*)ptr;
                 break;
             case IO_APIC_NMI_SRC:
-                kprint("d\n");
                 ionmi_apic_tbl[ionmi_apic_idx++] = (struct ionmi_apic_t*)ptr;
                 break;
             case LOCAL_APIC_NMI:
-                kprint("e\n");
                 nmi_lapic_tbl[nmi_lapic_idx++] = (struct nmi_lapic_t*)ptr;
                 break;
             case LOCAL_APIC_ADDR_OVERRIDE:
-                kprint("f\n");
                 addro_lapic_tbl[addro_lapic_idx++] = (struct addro_lapic_t*)ptr;
                 break;
             case PROCESSOR_LOCAL_X2_APIC:
-                kprint("g\n");
                 procx2_lapic_tbl[procx2_lapic_idx++] = (struct procx2_lapic_t*)ptr;
                 break;
         }
         ptr += *(ptr + 1);
-        kprint("here2\n");
     }
 }
 

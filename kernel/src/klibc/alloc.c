@@ -48,7 +48,6 @@ void* mmap(uintptr_t addr, uint64_t size, int flags) {
         size = align_up(size); 
     }
     void* ptr = pmm_alloc(size);
-    char buf[HEX_STRING_MAX];
     uint64_t pages = size / PAGE_SIZE;
     for (uint64_t i = 0; i < pages; i += PAGE_SIZE) {
         vmm_map_page(root_page_dir, (uint64_t)(ptr + i), (uint64_t)(addr + i), flags);
