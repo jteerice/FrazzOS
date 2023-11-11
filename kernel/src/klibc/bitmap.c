@@ -11,8 +11,8 @@ bool bitmap_test_bit(uint64_t idx, uint64_t* buffer) {
     return buffer[idx / BITS_PER_BLOCK] & (1 << (idx % BITS_PER_BLOCK));
 }
 
-int is_free_region_big_enough(int start, uint64_t* buffer, uint64_t num_bytes) {
-    for (uint64_t i = 0; i < num_bytes; i++) {
+int is_free_region_big_enough(int start, uint64_t* buffer, uint64_t num_blocks) {
+    for (uint64_t i = 0; i < num_blocks; i++) {
         if (bitmap_test_bit(start + i, buffer)) {
             return start + i;
         }

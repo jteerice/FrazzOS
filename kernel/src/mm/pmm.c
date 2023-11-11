@@ -208,7 +208,7 @@ void* pmm_alloc(uint64_t size) {
     pmm_info.available_pages -= num_pages;
     pmm_info.used_pages += num_pages;
 
-    return (void*)(uint64_t)(phys_to_hh(page_frame * PAGE_SIZE));
+    return (void*)((uint64_t)(page_frame * PAGE_SIZE));
 }
 
 void pmm_init() {

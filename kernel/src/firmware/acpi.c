@@ -91,37 +91,22 @@ static void madt_init() {
 
     char buf[HEX_STRING_MAX];
     proc_apic_tbl    = malloc(ACPI_APIC_TBL_SIZE);
-    kprint("first tbl addr @ ");
+    kprint("proc apic tbl @ ");
     kprint(ull_to_hex(buf, (uint64_t)proc_apic_tbl));
     kprint("\n");
     io_apic_tbl      = malloc(ACPI_APIC_TBL_SIZE);
-    kprint("second tbl addr @ ");
+    kprint("io apic tbl @ ");
     kprint(ull_to_hex(buf, (uint64_t)io_apic_tbl));
     kprint("\n");
     ioso_apic_tbl    = malloc(ACPI_APIC_TBL_SIZE);
-    kprint("third tbl addr @ ");
-    kprint(ull_to_hex(buf, (uint64_t)ioso_apic_tbl));
-    kprint("\n");
     ionmi_apic_tbl   = malloc(ACPI_APIC_TBL_SIZE);
     nmi_lapic_tbl    = malloc(ACPI_APIC_TBL_SIZE);
     addro_lapic_tbl  = malloc(ACPI_APIC_TBL_SIZE);
     procx2_lapic_tbl = malloc(ACPI_APIC_TBL_SIZE);
 
     uint64_t max_madt_addr = (uint64_t)(&madt->header + madt->header.length);
-    kprint("madt table addr @ ");
-    kprint(ull_to_hex(buf, (uint64_t)&madt->table));
-    kprint("\n");
     uint8_t* ptr = (uint8_t*)&madt->table;
-    kprint("ptr @ ");
-    kprint(ull_to_hex(buf, (uint64_t)ptr));
-    kprint("\n");
-    kprint("first entry entry -- ");
-    kprint(ull_to_hex(buf, (uint64_t)(*ptr & 0xFF)));
-    kprint(" first entry length -- ");
-    kprint(ull_to_hex(buf, (uint64_t)(*(ptr + 1) & 0xFF)));
-    kprint("\n");
     while ((uint64_t)ptr < max_madt_addr) {
-        kprint("here\n");
         switch(*ptr) {
             case PROCESSOR_LOCAL_APIC:
                 kprint("a\n");
@@ -172,7 +157,7 @@ void acpi_init() {
         acpi_version_2 = true;
     } else {
         rsdt = (struct rsdt_t*)(uintptr_t)phys_to_hh((uintptr_t)rsdp->rsdt_addr);
-        for (uint64_t i = 0; i < rsdt->header.length; i++) {
+        for (uint64_t i = 0; i < align_up(rsdt->header.length); i += PAGE_SIZE) {
             vmm_map_page(root_page_dir, (uint64_t)rsdp->rsdt_addr + i, (uint64_t)rsdt + i, PTE_PRESENT | PTE_READ_WRITE);
         }
         if (!sdt_validate_sig(&rsdt->header, "RSDT") || !sdt_validate_checksum(&rsdt->header)) {
