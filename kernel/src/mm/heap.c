@@ -11,7 +11,7 @@ struct heap heap;
 
 void heap_init() {
     kprint("[KERNEL] Heap Initializing... ");
-    heap.heap_addr = mmap(FRAZZOS_HEAP_START_ADDR, FRAZZOS_HEAP_SIZE, PTE_PRESENT | PTE_READ_WRITE);
+    heap.heap_addr = phys_to_hh(pmm_alloc(FRAZZOS_HEAP_SIZE));
     heap.free_blocks = FRAZZOS_HEAP_SIZE / BLOCK_SIZE;
     heap.used_blocks = 0;
     memset(heap.bitmap, 0, ((FRAZZOS_HEAP_SIZE / BLOCK_SIZE) / BITS_PER_BLOCK) * 8); 

@@ -94,10 +94,10 @@ static void madt_init() {
     kprint("proc apic tbl @ ");
     kprint(ull_to_hex(buf, (uint64_t)proc_apic_tbl));
     kprint("\n");
-    io_apic_tbl      = malloc(ACPI_APIC_TBL_SIZE);
-    kprint("io apic tbl @ ");
-    kprint(ull_to_hex(buf, (uint64_t)io_apic_tbl));
+    kprint("proc apic idx = ");
+    kprint(ull_to_hex(buf, (uint64_t)proc_apic_idx));
     kprint("\n");
+    io_apic_tbl      = malloc(ACPI_APIC_TBL_SIZE);
     ioso_apic_tbl    = malloc(ACPI_APIC_TBL_SIZE);
     ionmi_apic_tbl   = malloc(ACPI_APIC_TBL_SIZE);
     nmi_lapic_tbl    = malloc(ACPI_APIC_TBL_SIZE);
@@ -110,7 +110,8 @@ static void madt_init() {
         switch(*ptr) {
             case PROCESSOR_LOCAL_APIC:
                 kprint("a\n");
-                proc_apic_tbl[proc_apic_idx++] = (struct proc_apic_t*)ptr;
+                proc_apic_tbl[proc_apic_idx++] = (struct proc_apic_t*)1;
+                //proc_apic_tbl[proc_apic_idx++] = (struct proc_apic_t*)ptr;
                 kprint("fucked!\n");
                 break;
             case IO_APIC:

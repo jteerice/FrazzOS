@@ -12,13 +12,13 @@ extern struct heap heap;
 extern uint64_t* root_page_dir;
 
 void* malloc(uint64_t size) {
+    if (heap.free_blocks < (size / BLOCK_SIZE)) {
+        return (void*)ENOMEM;
+    }
+
     int next_start;
     uint64_t buffer_long_size = ((FRAZZOS_HEAP_SIZE / BLOCK_SIZE) / BITS_PER_BLOCK) * 8;
     int start = find_first_free(0, heap.bitmap, buffer_long_size);
-    char buf[HEX_STRING_MAX];
-    kprint("start index: ");
-    kprint(ull_to_hex(buf, (uint64_t)start));
-    kprint("\n");
 
     do {
         next_start = is_free_region_big_enough(start, heap.bitmap, size / BLOCK_SIZE);
@@ -40,7 +40,7 @@ void* malloc(uint64_t size) {
     heap.free_blocks -= size / BLOCK_SIZE;
     heap.used_blocks += size / BLOCK_SIZE;
 
-    return (void*)(FRAZZOS_HEAP_START_ADDR + (start * BLOCK_SIZE));
+    return (void*)(heap.heap_addr + (start * BLOCK_SIZE));
 }
 
 void* mmap(uintptr_t addr, uint64_t size, int flags) {
@@ -48,6 +48,7 @@ void* mmap(uintptr_t addr, uint64_t size, int flags) {
         size = align_up(size); 
     }
     void* ptr = pmm_alloc(size);
+    char buf[HEX_STRING_MAX];
     uint64_t pages = size / PAGE_SIZE;
     for (uint64_t i = 0; i < pages; i += PAGE_SIZE) {
         vmm_map_page(root_page_dir, (uint64_t)(ptr + i), (uint64_t)(addr + i), flags);

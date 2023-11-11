@@ -20,17 +20,6 @@ void _start(void) {
     heap_init();
     //acpi_init();
 
-    char buf[HEX_STRING_MAX];
-    void* ptr1 = malloc(256);
-    kprint("ptr1 @ ");
-    kprint(ull_to_hex(buf, (uint64_t)ptr1));
-    kprint("\n");
-    void* ptr2 = malloc(256);
-    kprint("ptr2 @ ");
-    kprint(ull_to_hex(buf, (uint64_t)ptr2));
-    kprint("\n");
-
-    
     // We're done, just hang...
     while (1) {}
 }
