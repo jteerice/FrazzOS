@@ -11,7 +11,7 @@ extern uint64_t* root_page_dir;
 static struct rsdp_t* rsdp;
 static struct rsdt_t* rsdt;
 static bool acpi_version_2 = false;
-static struct madt_t* madt;
+struct madt_t* madt;
 
 static struct proc_apic_t**    proc_apic_tbl;
 static struct io_apic_t**      io_apic_tbl;

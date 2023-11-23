@@ -8,6 +8,7 @@
 #include "klibc/io.h"
 #include "klibc/string.h"
 #include "klibc/alloc.h"
+#include "devices/apic.h"
 
 // linker script accordingly.
 void _start(void) {
@@ -19,6 +20,7 @@ void _start(void) {
     vmm_init();
     heap_init();
     acpi_init();
+    apic_init();
 
     // We're done, just hang...
     while (1) {}
