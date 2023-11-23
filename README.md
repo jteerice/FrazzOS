@@ -18,16 +18,15 @@ Building this project requires a cross-compiler for x64. A great resource for cr
 - [X] Virtual Memory Manager
 - [X] Paging
 - [X] Heap Memory Manager
-- [ ] ACPI
-- [ ] APIC
+- [X] ACPI
+- [X] APIC
 - [ ] IOAPIC
-- [ ] LAPIC
+- [X] LAPIC
 - [ ] HPET
 - [ ] APIC-TIMER
 - [ ] SMP
 - [ ] Multitasking
 - [ ] Syscalls
 - [ ] Userspace
-- [ ] ACPI
 
 
