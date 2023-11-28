@@ -2,6 +2,8 @@
 #define APIC_H
 
 #include <stdint.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 #define APIC_SPURIOUS_VECTOR_REG 0xf
 #define APIC_EOI_REG 0xb0

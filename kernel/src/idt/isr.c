@@ -14,3 +14,8 @@ void divide_by_zero_exception_handler() {
     kprint("Divide by zero exception!\n");
     asm volatile("cli; hlt");
 }
+
+void keyboard_irq_handler() {
+    kprint("Key pressed!\n");
+    asm volatile("cli; hlt");
+}

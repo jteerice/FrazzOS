@@ -13,13 +13,13 @@ static struct rsdt_t* rsdt;
 static bool acpi_version_2 = false;
 struct madt_t* madt;
 
-static struct proc_apic_t**    proc_apic_tbl;
-static struct io_apic_t**      io_apic_tbl;
-static struct ioso_apic_t**    ioso_apic_tbl;
-static struct ionmi_apic_t**   ionmi_apic_tbl;
-static struct nmi_lapic_t**    nmi_lapic_tbl;
-static struct addro_lapic_t**  addro_lapic_tbl;
-static struct procx2_lapic_t** procx2_lapic_tbl;
+struct proc_lapic_t**    proc_apic_tbl;
+struct io_apic_t**      io_apic_tbl;
+struct ioso_apic_t**    ioso_apic_tbl;
+struct ionmi_apic_t**   ionmi_apic_tbl;
+struct nmi_lapic_t**    nmi_lapic_tbl;
+struct addro_lapic_t**  addro_lapic_tbl;
+struct procx2_lapic_t** procx2_lapic_tbl;
 
 uint64_t    proc_apic_idx = 0;
 uint64_t      io_apic_idx = 0;
@@ -102,7 +102,7 @@ static void madt_init() {
     while (ptr < max_madt_addr) {
         switch(*ptr) {             
             case PROCESSOR_LOCAL_APIC:
-                proc_apic_tbl[proc_apic_idx++] = (struct proc_apic_t*)ptr;
+                proc_apic_tbl[proc_apic_idx++] = (struct proc_lapic_t*)ptr;
                 break;
             case IO_APIC:
                 io_apic_tbl[io_apic_idx++] = (struct io_apic_t*)ptr;

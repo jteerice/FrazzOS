@@ -57,14 +57,14 @@ struct madt_t {
     uint32_t lapic_addr;
     uint32_t flags;
     struct madt_tbl_entry_t table[];
-}__attribute((packed));
+}__attribute__((packed));
 
 struct proc_lapic_t {
     struct madt_tbl_entry_t record;
     uint8_t proc_id;
     uint8_t apic_id;
     uint32_t flags;
-}__attribute((packed));
+}__attribute__((packed));
 
 struct io_apic_t {
     struct madt_tbl_entry_t record;
@@ -72,7 +72,7 @@ struct io_apic_t {
     uint8_t reserved;
     uint32_t io_apic_addr;
     uint32_t gsib;
-}__attribute((packed));
+}__attribute__((packed));
 
 struct ioso_apic_t {
     struct madt_tbl_entry_t record;

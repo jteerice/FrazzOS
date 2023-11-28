@@ -4,10 +4,12 @@
 #include "firmware/acpi.h"
 #include "mm/mm.h"
 #include "pic.h"
-#include <stdbool.h>
+#include "klibc/string.h"
 
 extern void cpuid_proc_feat_info(struct cpuid_registers_t* regs);
 extern struct madt_t* madt;
+extern struct proc_lapic_t** proc_apic_tbl;
+uint64_t lapic_id;
 uintptr_t lapic_base;
 
 void lapic_write_reg(uint32_t reg, uint32_t data) {
@@ -37,5 +39,6 @@ void apic_init() {
     remap_pic();
     disable_pic();
     enable_lapic();
+    lapic_id = proc_apic_tbl[0]->apic_id;
     kprint("Success\n");
 }

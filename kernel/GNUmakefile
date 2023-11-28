@@ -58,7 +58,7 @@ override CFLAGS += \
     -mno-sse \
     -mno-sse2 \
     -mno-red-zone \
-    -g
+    -g # Remove this after finished
 
 # Internal C preprocessor flags that should not be changed by the user.
 override CPPFLAGS := \

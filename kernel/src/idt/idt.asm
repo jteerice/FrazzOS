@@ -26,6 +26,12 @@ load_idt:
     sti
     ret
 
+global keyboard_irq
+extern keyboard_irq_handler
+keyboard_irq:
+    call keyboard_irq_handler 
+    iretq
+
 global divide_zero_exception
 extern divide_by_zero_exception_handler
 divide_zero_exception:
