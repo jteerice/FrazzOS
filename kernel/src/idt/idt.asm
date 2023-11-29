@@ -26,6 +26,12 @@ load_idt:
     sti
     ret
 
+global timer_irq
+extern timer_irq_handler
+timer_irq:
+    call timer_irq_handler
+    iretq
+
 global keyboard_irq
 extern keyboard_irq_handler
 keyboard_irq:

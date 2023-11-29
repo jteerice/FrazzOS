@@ -8,6 +8,7 @@ extern void* isr_stub_table[FRAZZOS_TOTAL_IDT_ENTRIES];
 extern void load_idt(struct idt_entry* idt_entry, int size);
 extern void divide_zero_exception();
 extern void keyboard_irq_handler();
+extern void timer_irq_handler();
 
 struct idt_entry idt[FRAZZOS_TOTAL_IDT_ENTRIES];
 struct idt_reg idt_reg;
@@ -35,11 +36,8 @@ void idt_init() {
     }
 
     idt_set_entry(0, divide_zero_exception, IDT_GATE_INTERRUPT);
-    //idt_set_entry(31, keyboard_irq_handler, IDT_GATE_INTERRUPT);
-    idt_set_entry(32, keyboard_irq_handler, IDT_GATE_INTERRUPT);
+    idt_set_entry(32, timer_irq_handler, IDT_GATE_INTERRUPT);
     idt_set_entry(33, keyboard_irq_handler, IDT_GATE_INTERRUPT);
-    idt_set_entry(34, keyboard_irq_handler, IDT_GATE_INTERRUPT);
-    idt_set_entry(35, keyboard_irq_handler, IDT_GATE_INTERRUPT);
     load_idt(idt, (sizeof(idt) - 1));
 
     kprint("Success\n");
