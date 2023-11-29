@@ -19,6 +19,7 @@ void divide_by_zero_exception_handler() {
 void keyboard_irq_handler() {
     kprint("Key pressed!\n");
     lapic_write_reg(APIC_EOI_REG, 0);
+    //asm volatile ("iretq");
 }
 
 void timer_irq_handler() {
