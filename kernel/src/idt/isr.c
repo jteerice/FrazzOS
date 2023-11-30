@@ -1,4 +1,5 @@
 #include "isr.h"
+#include "devices/cpu.h"
 #include "klibc/io.h"
 #include "devices/apic.h"
 #include <flanterm.h>
@@ -19,6 +20,7 @@ void divide_by_zero_exception_handler() {
 void keyboard_irq_handler() {
     kprint("Key pressed!\n");
     lapic_write_reg(APIC_EOI_REG, 0);
+    inb(0x60);
     //asm volatile ("iretq");
 }
 

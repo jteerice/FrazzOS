@@ -20,7 +20,7 @@ Building this project requires a cross-compiler for x64. A great resource for cr
 - [X] Heap Memory Manager
 - [X] ACPI
 - [X] APIC
-- [ ] IOAPIC
+- [X] IOAPIC
 - [X] LAPIC
 - [ ] HPET
 - [ ] APIC-TIMER
