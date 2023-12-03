@@ -10,6 +10,7 @@
 #include "klibc/alloc.h"
 #include "devices/apic.h"
 #include "devices/ioapic.h"
+#include "devices/ps2.h"
 
 // linker script accordingly.
 void _start(void) {
@@ -23,6 +24,7 @@ void _start(void) {
     acpi_init();
     apic_init();
     ioapic_init();
+    ps2_init();
 
     // We're done, just hang...
     while (1) {}

@@ -2,6 +2,7 @@
 #include "devices/cpu.h"
 #include "klibc/io.h"
 #include "devices/apic.h"
+#include "devices/ps2.h"
 #include <flanterm.h>
 #include <backends/fb.h>
 
@@ -18,10 +19,8 @@ void divide_by_zero_exception_handler() {
 }
 
 void keyboard_irq_handler() {
-    kprint("Key pressed!\n");
+    keyboard_handler();
     lapic_write_reg(APIC_EOI_REG, 0);
-    inb(0x60);
-    //asm volatile ("iretq");
 }
 
 void timer_irq_handler() {
