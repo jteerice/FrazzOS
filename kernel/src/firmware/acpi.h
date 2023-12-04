@@ -111,6 +111,29 @@ struct procx2_lapic_t {
     uint32_t apic_id;
 }__attribute__((packed));
 
+struct hpet_address {
+    uint8_t address_id;
+    uint8_t register_width;
+    uint8_t register_offset;
+    uint8_t reserved;
+    uint64_t address;
+}__attribute__((packed));
+
+struct hpet_t {
+    struct acpi_sdt_header header;
+    uint8_t hardware_id;
+    uint8_t comparator_cnt : 5;
+    uint8_t counter_size : 1;
+    uint8_t resserved : 1;
+    uint8_t legacy_replacement : 1;
+    uint16_t pci_vendor_id;
+    struct hpet_address address_info;
+    uint8_t hpet_num;
+    uint16_t minimum_tick;
+    uint8_t page_prot;
+}__attribute__((packed));
+
 void acpi_init();
+struct acpi_sdt_header* acpi_find_sdt_tbl(const char* sig);
 
 #endif
