@@ -1,4 +1,5 @@
 #include "gdt/gdt.h"
+#include "devices/timer.h"
 #include "devices/hpet.h"
 #include "mm/vmm.h"
 #include "mm/pmm.h"
@@ -27,6 +28,7 @@ void _start(void) {
     ioapic_init();
     ps2_init();
     hpet_init();
+    apic_timer_init();
 
     // We're done, just hang...
     while (1) {}

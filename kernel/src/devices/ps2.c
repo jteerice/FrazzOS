@@ -1,4 +1,5 @@
 #include "ps2.h"
+#include "ioapic.h"
 #include "status.h"
 #include "klibc/string.h"
 #include "klibc/io.h"
@@ -276,5 +277,6 @@ void ps2_init() {
         inb(PS2_DATA_PORT);
     }
     ps2_send_command(ENABLE_SCANNING, PS2_COMMAND_PORT);
+    unmask_irq(KEYBOARD_IRQ);
     kprint("Success\n");
 }

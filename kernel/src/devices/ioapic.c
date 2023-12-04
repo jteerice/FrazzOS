@@ -6,6 +6,7 @@
 #include "klibc/alloc.h"
 #include "status.h"
 
+extern volatile uint32_t* lvt_timer_reg;
 extern struct io_apic_t** io_apic_tbl;
 extern struct ioso_apic_t** ioso_apic_tbl;
 extern uint64_t ioso_apic_idx;
@@ -51,12 +52,51 @@ void map_redtbl_entry(uint8_t entry, uint8_t vector) {
 
     data.raw_data = read_redtbl_entry(entry);
     data.entry.vector = vector + IDT_EXCEPTIONS;
-    data.entry.mask = 0;
+    data.entry.mask = 1;
     data.entry.destination = 0;
 
     uint8_t offset = calc_redtbl_offset(entry);
     write_ioapic_reg(offset, data.registers.lower);
     write_ioapic_reg(offset + 1, data.registers.upper);
+}
+
+int unmask_gsi(uint8_t idx) {
+    uint64_t data = read_redtbl_entry(idx);
+    if (idx > max_redirection_entry) {
+        return EINVAL;
+    }
+    uint8_t offset = calc_redtbl_offset(idx);
+    data &= ~(1 << 16);
+    write_ioapic_reg(offset, data);
+    return 0;
+}
+
+void mask_irq(uint8_t irq) {
+    if (irq == 0) {
+        *lvt_timer_reg |= (1 << 16);
+    } else {
+        for (uint64_t i = 0; i < ioso_apic_idx; i++) {
+            if (ioso_apic_tbl[i]->irq == irq) {
+                mask_gsi((uint8_t)ioso_apic_tbl[i]->gsi);
+                return;
+            }
+        }
+    }
+    mask_gsi(irq);
+}
+
+void unmask_irq(uint8_t irq) {
+    if (irq == 0) {
+        *lvt_timer_reg &= ~(1 << 16);
+    } else {
+        for (uint64_t i = 0; i < ioso_apic_idx; i++) {
+            if (ioso_apic_tbl[i]->irq == irq) {
+                unmask_gsi((uint8_t)ioso_apic_tbl[i]->gsi);
+                return;
+            }
+        }
+    }
+    unmask_gsi(irq);
 }
 
 void ioapic_init() {
@@ -82,13 +122,6 @@ void ioapic_init() {
             map_redtbl_entry(i, i);
         }
     }
-
-    // Mask all except keyboard interrupt
-    /*for (uint8_t i = 0; i < NUM_OF_IRQ; i++) {
-        if (i != 1) {
-            mask_gsi(i);
-        }
-    }*/
 
     kprint("Success\n");
 }

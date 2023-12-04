@@ -23,7 +23,7 @@ Building this project requires a cross-compiler for x64. A great resource for cr
 - [X] IOAPIC
 - [X] LAPIC
 - [X] HPET
-- [ ] APIC-TIMER
+- [X] APIC-TIMER
 - [ ] SMP
 - [ ] Multitasking
 - [ ] Syscalls

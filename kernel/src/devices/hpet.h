@@ -7,7 +7,7 @@
 #define INTERRUPT_STATUS_REGISTER_OFFSET 0x20
 #define MAIN_COUNTER_REGISTER_OFFSET 0xf0
 
-#define FREQUENCY_DIVISOR 1000000000000000
+#define FEMTOSECONDS_PER_MICROSECOND 1000000000
 #define FREQUENCY_HERTZ 1000
 #define ENABLE_HPET 0x01
 #define ENABLE_LEGACY_REPLACE 0x02
@@ -37,5 +37,9 @@ struct hpet_table_t {
 };
 
 void hpet_init();
+void reset_hpet_timer();
+void start_hpet_timer();
+uint64_t poll_ticks_hpet_timer();
+uint64_t poll_time_hpet_timer();
 
 #endif

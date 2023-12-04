@@ -14,6 +14,11 @@
 
 #define IDT_EXCEPTIONS 32
 
+enum IRQ {
+    TIMER_IRQ,
+    KEYBOARD_IRQ
+};
+
 static inline uint8_t calc_redtbl_offset(uint8_t entry_num) {
     return 0x10 + (entry_num * 2);
 }
@@ -43,5 +48,7 @@ union redirection_entry_t {
 }__attribute__((packed));
 
 void ioapic_init();
+void unmask_irq(uint8_t irq);
+void mask_irq(uint8_t irq);
 
 #endif
