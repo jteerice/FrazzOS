@@ -5,13 +5,9 @@
 #include "klibc/io.h"
 #include "firmware/acpi.h"
 
-extern uint64_t* root_page_dir;
-struct hpet_t* hpet;
-volatile uint64_t* hpet_base;
-volatile uint64_t* capabilities_reg;
-volatile uint64_t* config_reg;
-volatile uint64_t* counter_reg;
-volatile uint64_t* interrupt_status_reg;
+volatile struct hpet_t* hpet;
+volatile struct hpet_table_t* hpet_table;
+volatile uint32_t minimum_tick;
 
 void hpet_init() {
     kprint("[KERNEL] HPET Intializing... ");
@@ -23,17 +19,17 @@ void hpet_init() {
             asm ("hlt");
         }
     } 
-    hpet_base = (volatile uint64_t*)phys_to_hh(hpet->address_info.address);
-    capabilities_reg = (volatile uint64_t*)hpet_base;
-    config_reg = (volatile uint64_t*)((uint64_t)hpet_base + CONFIG_REGISTER_OFFSET);
-    counter_reg = (volatile uint64_t*)((uint64_t)hpet_base + MAIN_COUNTER_REGISTER_OFFSET);
-    interrupt_status_reg = (volatile uint64_t*)((uint64_t)hpet_base + INTERRUPT_STATUS_REGISTER_OFFSET);
-    uint32_t minimum_tick = *(uint64_t*)(capabilities_reg) >> 32;
-    uint64_t microsecond = MICROSECOND_DIVISOR / minimum_tick;
-    if (!(*config_reg & ENABLE_HPET)) {
-        *counter_reg = (volatile uint64_t)(MICROSECOND_SCALAR - microsecond);
+
+    hpet_table = (volatile struct hpet_table_t*)phys_to_hh(hpet->address_info.address);
+    minimum_tick = hpet_table->capabilities >> 32;
+    uint64_t frequency = FREQUENCY_DIVISOR / minimum_tick;
+    hpet_table->config |= ENABLE_LEGACY_REPLACE;
+    if (!(hpet_table->config & ENABLE_HPET)) {
+        hpet_table->main_counter = 0;
     }
-    *config_reg |= ENABLE_HPET;
+    hpet_table->timers[0].cap_config |= (TIMER_ENABLE_INTERRUPT | ENABLE_PERIODIC_MODE | ENABLE_SET_ACCUMULATOR);
+    hpet_table->timers[0].comparator = frequency / FREQUENCY_HERTZ;
+    hpet_table->config |= ENABLE_HPET;
 
     kprint("Success\n");
 }

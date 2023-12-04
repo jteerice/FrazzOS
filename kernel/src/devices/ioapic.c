@@ -84,11 +84,11 @@ void ioapic_init() {
     }
 
     // Mask all except keyboard interrupt
-    for (uint8_t i = 0; i < NUM_OF_IRQ; i++) {
+    /*for (uint8_t i = 0; i < NUM_OF_IRQ; i++) {
         if (i != 1) {
             mask_gsi(i);
         }
-    }
+    }*/
 
     kprint("Success\n");
 }

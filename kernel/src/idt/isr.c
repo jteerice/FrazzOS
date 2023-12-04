@@ -24,6 +24,6 @@ void keyboard_irq_handler() {
 }
 
 void timer_irq_handler() {
-    kprint("Timer interrupt!\n");
+    //kprint("Timer interrupt!\n");
     lapic_write_reg(APIC_EOI_REG, 0);
 }
