@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define DEFAULT_BG 0x130D1A
+
 struct graphic_buffer {
     void* framebuffer_addr;
     uint64_t framebuffer_width;
