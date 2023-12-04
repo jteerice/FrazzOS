@@ -13,11 +13,13 @@
 #include "devices/apic.h"
 #include "devices/ioapic.h"
 #include "devices/ps2.h"
+#include "drivers/graphics/framebuffer.h"
 
 // linker script accordingly.
 void _start(void) {
 
-    terminal_init();
+    framebuffer_init();
+    //terminal_init();
     gdt_init();
     idt_init();
     pmm_init();

@@ -3,7 +3,7 @@
 #include <backends/fb.h>
 
 
-static volatile struct limine_framebuffer_request framebuffer_request = {
+/*static volatile struct limine_framebuffer_request framebuffer_request = {
     .id = LIMINE_FRAMEBUFFER_REQUEST,
     .revision = 0
 };
@@ -37,4 +37,4 @@ void terminal_init() {
     flanterm_write(ft_ctx, msg3, sizeof(msg3));
     flanterm_write(ft_ctx, msg2, sizeof(msg2));
     flanterm_write(ft_ctx, msg1, sizeof(msg1));
-}
+}*/
