@@ -1,6 +1,6 @@
 #ifndef IO_H
 #define IO_H
 
-void kprint(const char str[]);
+void kprint(char* str);
 
 #endif

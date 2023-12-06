@@ -3,7 +3,8 @@
 
 #include <stdint.h>
 
-#define DEFAULT_BG 0x130D1A
+#define DEFAULT_BG 0x0B060F
+#define PURPLE 0x734AB9
 
 struct graphic_buffer {
     void* framebuffer_addr;
@@ -16,5 +17,6 @@ struct graphic_buffer {
 };
 
 void framebuffer_init();
+void term_print_string(char* str, uint32_t color);
 
 #endif
