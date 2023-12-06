@@ -14,6 +14,7 @@ static volatile struct limine_framebuffer_request framebuffer_request = {
 };
 
 extern uint8_t _binary_src_fonts_lanapixel_sfn_start;
+extern uint8_t _binary_src_fonts_unifont_sfn_start;
 struct graphic_buffer gtx_buffer;
 
 void draw_pixel(int x, int y, uint32_t color) {
@@ -58,7 +59,9 @@ void term_print_char(uint32_t unicode, int x, int y, uint32_t color) {
         ssfn_dst.y = gtx_buffer.framebuffer_height - gtx_buffer.glyph_height;
         term_line_shift_up();
     }
-    if (unicode == '\n') {
+    if (unicode == '\0') {
+        return;
+    } else if (unicode == '\n') {
         ssfn_dst.x = 0;
         ssfn_dst.y += gtx_buffer.glyph_height;
         return;
@@ -103,7 +106,7 @@ void framebuffer_init() {
     gtx_buffer.glyph_height = 16;
     gtx_buffer.glyph_width = 8;
 
-    ssfn_src = (ssfn_font_t*)&_binary_src_fonts_lanapixel_sfn_start;
+    ssfn_src = (ssfn_font_t*)&_binary_src_fonts_unifont_sfn_start;
     ssfn_dst.ptr = gtx_buffer.framebuffer_addr;
     ssfn_dst.w = gtx_buffer.framebuffer_width;
     ssfn_dst.h = gtx_buffer.framebuffer_height;
@@ -112,11 +115,9 @@ void framebuffer_init() {
     ssfn_dst.y = 0;
 
     term_set_bg(DEFAULT_BG);
-    term_print_string("-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n", PURPLE);
+    term_print_string("-----------------------------------------------------------------------------------------------------------------\n", PURPLE);
     term_print_string("\n", PURPLE);
     term_print_string("Kernel Booted -- Welcome to FrazzOS 64-bit!\n", PURPLE);
     term_print_string("\n", PURPLE);
-    term_print_string("-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n", PURPLE);
-    term_print_string("\n", PURPLE);
-    term_print_string("\n", PURPLE);
+    term_print_string("-----------------------------------------------------------------------------------------------------------------\n", PURPLE);
 }

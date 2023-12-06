@@ -102,8 +102,9 @@ src/limine.h:
 bin/$(KERNEL): GNUmakefile linker.ld $(OBJ)
 	mkdir -p obj/fonts
 	$(LD) -r -b binary -o obj/fonts/lanapixel.o src/fonts/lanapixel.sfn
+	$(LD) -r -b binary -o obj/fonts/unifont.o src/fonts/unifont.sfn
 	mkdir -p "$$(dirname $@)"
-	$(LD) obj/fonts/lanapixel.o $(OBJ) $(LDFLAGS) -o $@
+	$(LD) obj/fonts/lanapixel.o obj/fonts/unifont.o $(OBJ) $(LDFLAGS) -o $@
 
 # Include header dependencies.
 -include $(HEADER_DEPS)
