@@ -33,8 +33,8 @@ void term_set_bg(uint32_t bg_color) {
 
 void term_line_shift_up() {
     uint32_t* framebuffer = (uint32_t*)gtx_buffer.framebuffer_addr;
-    for (uint64_t i = gtx_buffer.glyph_height; i < gtx_buffer.framebuffer_width; i++) {
-        for (uint64_t j = 0; j < gtx_buffer.framebuffer_height; j++) {
+    for (uint64_t i = gtx_buffer.glyph_height; i < gtx_buffer.framebuffer_height; i++) {
+        for (uint64_t j = 0; j < gtx_buffer.framebuffer_width; j++) {
             uint64_t idx = i * (gtx_buffer.pitch / sizeof(int)) + j;
             uint64_t current_color = framebuffer[idx];
             framebuffer[idx] = ssfn_dst.bg;
@@ -117,4 +117,6 @@ void framebuffer_init() {
     term_print_string("Kernel Booted -- Welcome to FrazzOS 64-bit!\n", PURPLE);
     term_print_string("\n", PURPLE);
     term_print_string("-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n", PURPLE);
+    term_print_string("\n", PURPLE);
+    term_print_string("\n", PURPLE);
 }
