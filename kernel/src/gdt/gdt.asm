@@ -4,7 +4,6 @@ gdt:
     dw 0
     dq 0
 
-
 section .text
 global load_gdt
 global load_segment_registers

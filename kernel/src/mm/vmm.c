@@ -19,7 +19,7 @@ static uint64_t *vmm_get_next_map_level(uint64_t *page_directory, uintptr_t inde
 }
 
 void vmm_flush_tlb(void *address) {
-    asm volatile("invlpg (%0)" : : "r" (address));
+    asm volatile("invlpg (%0);" : : "r"(address) : "memory");
 }
 
 void vmm_map_page(uint64_t *root_page_dir, uintptr_t phys_addr, uintptr_t virt_addr, int flags) {
@@ -76,25 +76,26 @@ void vmm_init() {
     root_page_dir = vmm_new_page_dir();
 
     // Identity map first 4 GB
-    for (uint64_t i = 0x1000; i < 4 * GIGABYTE; i += PAGE_SIZE) {
+    /*for (uint64_t i = 0; i < 4 * GIGABYTE; i += PAGE_SIZE) {
         vmm_map_page(root_page_dir, i, i, PTE_PRESENT | PTE_READ_WRITE);
-    } 
+    }
 
     kprint("[KERNEL] 1/3 Identity Mapped First 4GB\n");
+    */
 
     // Direct map
     for (uint64_t i = 0; i < 4 * GIGABYTE; i += PAGE_SIZE) {
         vmm_map_page(root_page_dir, i, phys_to_hh(i), PTE_PRESENT | PTE_READ_WRITE);
     } 
 
-    kprint("[KERNEL] 2/3 Direct Map First 4GB to 0xffff800000000000\n");
+    kprint("[KERNEL] 1/2 Direct Map First 4GB to 0xffff800000000000\n");
 
     // Map kernel code
     for (uint64_t i = 0; i < 4 * GIGABYTE; i += PAGE_SIZE) {
         vmm_map_page(root_page_dir, response->physical_base + i, KERNEL_VIRT_TOP_ADDR + i, PTE_PRESENT | PTE_READ_WRITE); 
     }
 
-    kprint("[KERNEL] 3/3 Kernel Code Mapped\n");
+    kprint("[KERNEL] 2/2 Kernel Code Mapped\n");
 
     vmm_activate_page_directory(root_page_dir); 
 

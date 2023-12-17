@@ -1,4 +1,5 @@
 #include "gdt/gdt.h"
+#include "smp/smp.h"
 #include "devices/timer.h"
 #include "devices/hpet.h"
 #include "mm/vmm.h"
@@ -31,6 +32,7 @@ void _start(void) {
     ps2_init();
     hpet_init();
     apic_timer_init();
+    smp_init();
 
     // We're done, just hang...
     while (1) {}

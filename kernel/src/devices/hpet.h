@@ -41,5 +41,7 @@ void reset_hpet_timer();
 void start_hpet_timer();
 uint64_t poll_ticks_hpet_timer();
 uint64_t poll_time_hpet_timer();
+void wait_10ms();
+void usleep();
 
 #endif

@@ -4,6 +4,8 @@
 #include "klibc/string.h"
 #include "hpet.h"
 
+#define APIC_TIMER_INTERVAL 10000
+
 extern volatile uint32_t* lapic_base;
 extern volatile struct hpet_table_t* hpet_table;
 extern volatile uint64_t ticks_per_microsecond;
@@ -27,7 +29,7 @@ void apic_timer_init() {
     reset_hpet_timer();
     reset_apic_timer();
     start_hpet_timer();
-    while (poll_time_hpet_timer() < ((uint64_t)(FEMTOSECONDS_PER_MICROSECOND) * 10)) {}
+    while (poll_time_hpet_timer() < ((uint64_t)(FEMTOSECONDS_PER_MICROSECOND) * APIC_TIMER_INTERVAL)) {}
     mask_irq(TIMER_IRQ);
     uint64_t apic_ticks_10ms = (uint64_t)MAX_INIT_COUNT_VAL - (uint64_t)*current_count_reg;
     *lvt_timer_reg |= ((TIMER_IRQ + IDT_EXCEPTIONS) | TIMER_PERIODIC_MODE);

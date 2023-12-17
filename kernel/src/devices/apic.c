@@ -16,6 +16,10 @@ void lapic_write_reg(uint32_t reg, uint32_t data) {
     *((volatile uint32_t*)(lapic_base + reg)) = data;
 }
 
+uint32_t lapic_read_reg(uint32_t reg) {
+    return *((volatile uint32_t*)(lapic_base + reg));
+}
+
 static void enable_lapic() {
     lapic_write_reg(APIC_SPURIOUS_VECTOR_REG, APIC_ENABLE | SPURIOUS_INT);
 }

@@ -1,4 +1,6 @@
 #include "gdt.h"
+#include "klibc/string.h"
+#include "klibc/io.h"
 #include "../config.h"
 #include "klibc/memory.h"
 #include <flanterm.h>

@@ -18,5 +18,6 @@ struct graphic_buffer {
 
 void framebuffer_init();
 void term_print_string(char* str, uint32_t color);
+void term_line_shift_up();
 
 #endif

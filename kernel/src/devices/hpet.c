@@ -27,6 +27,20 @@ uint64_t poll_time_hpet_timer() {
     return hpet_table->main_counter * femto_per_tick;
 }
 
+void wait_10ms() {
+    reset_hpet_timer();
+    start_hpet_timer();
+    while (poll_time_hpet_timer() < ((uint64_t)FEMTOSECONDS_PER_MICROSECOND * 10000)) {}
+    return;
+}
+
+void usleep(uint64_t ms) {
+    reset_hpet_timer();
+    start_hpet_timer();
+    while (poll_time_hpet_timer() < ((uint64_t)FEMTOSECONDS_PER_MICROSECOND * ms)) {}
+    return;
+}
+
 void hpet_init() {
     kprint("[KERNEL] HPET Initializing... ");
 
