@@ -76,26 +76,25 @@ void vmm_init() {
     root_page_dir = vmm_new_page_dir();
 
     // Identity map first 4 GB
-    /*for (uint64_t i = 0; i < 4 * GIGABYTE; i += PAGE_SIZE) {
+    for (uint64_t i = 0; i < 4 * GIGABYTE; i += PAGE_SIZE) {
         vmm_map_page(root_page_dir, i, i, PTE_PRESENT | PTE_READ_WRITE);
     }
 
     kprint("[KERNEL] 1/3 Identity Mapped First 4GB\n");
-    */
 
     // Direct map
     for (uint64_t i = 0; i < 4 * GIGABYTE; i += PAGE_SIZE) {
         vmm_map_page(root_page_dir, i, phys_to_hh(i), PTE_PRESENT | PTE_READ_WRITE);
     } 
 
-    kprint("[KERNEL] 1/2 Direct Map First 4GB to 0xffff800000000000\n");
+    kprint("[KERNEL] 2/3 Direct Map First 4GB to 0xffff800000000000\n");
 
     // Map kernel code
     for (uint64_t i = 0; i < 4 * GIGABYTE; i += PAGE_SIZE) {
         vmm_map_page(root_page_dir, response->physical_base + i, KERNEL_VIRT_TOP_ADDR + i, PTE_PRESENT | PTE_READ_WRITE); 
     }
 
-    kprint("[KERNEL] 2/2 Kernel Code Mapped\n");
+    kprint("[KERNEL] 3/3 Kernel Code Mapped\n");
 
     vmm_activate_page_directory(root_page_dir); 
 
