@@ -2,6 +2,17 @@
 #include "memory.h"
 #include "io.h"
 
+int strncpy(char* dst, const char* src, size_t size) {
+    size_t res = 0;
+    for (size_t i = 0; i < size; i++) {
+        if (src[i] != 0) {
+            dst[i] = src[i];
+            res++;
+        }
+    }
+    return res;
+}
+
 int strlen(const char* str) {
     int res = 0;
     while (*str++) res++;

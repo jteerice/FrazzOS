@@ -99,6 +99,18 @@ void unmask_irq(uint8_t irq) {
     unmask_gsi(irq);
 }
 
+void mask_all_irq() {
+    for (int i = IDT_EXCEPTIONS; i < IDT_EXCEPTIONS + NUM_OF_IRQ; i++) {
+        mask_irq(i);
+    }
+}
+
+void unmask_all_irq() {
+    for (int i = IDT_EXCEPTIONS; i < IDT_EXCEPTIONS + NUM_OF_IRQ; i++) {
+        unmask_irq(i);
+    }
+}
+
 void ioapic_init() {
     kprint("[KERNEL] IOAPIC Initializing... ");
     ioapic_base = (uint32_t*)((uintptr_t)io_apic_tbl[0]->io_apic_addr);

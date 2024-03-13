@@ -1,4 +1,6 @@
 #include "gdt/gdt.h"
+#include "proc/process.h"
+#include "tss/tss.h"
 #include "smp/smp.h"
 #include "devices/timer.h"
 #include "devices/hpet.h"
@@ -33,6 +35,8 @@ void _start(void) {
     hpet_init();
     apic_timer_init();
     smp_init();
+    //init_tss();
+    init_multitasking();
 
     // We're done, just hang...
     while (1) {}

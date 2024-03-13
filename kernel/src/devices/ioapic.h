@@ -50,5 +50,7 @@ union redirection_entry_t {
 void ioapic_init();
 void unmask_irq(uint8_t irq);
 void mask_irq(uint8_t irq);
+void mask_all_irq();
+void unmask_all_irq();
 
 #endif
