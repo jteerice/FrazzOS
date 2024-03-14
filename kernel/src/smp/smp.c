@@ -1,4 +1,5 @@
 #include "smp.h"
+#include "klibc/alloc.h"
 #include "klibc/string.h"
 #include "klibc/lock.h"
 #include "klibc/io.h"
@@ -18,6 +19,24 @@ void ap_entry_point () {
     unlock(&ap_done_lock);
     while (1) {}
 }
+
+void write_msr(uint64_t msr, uint64_t val) {
+    uint64_t a = val & 0xFFFFFFFF;
+    uint64_t d = val >> 32;
+    asm volatile("wrmsr" :: "a" (a), "d" (d), "c" (msr));
+}
+
+struct cpu_local* get_cpu_local() {
+    struct cpu_local* res;
+    asm volatile("movq %%gs:(0), %0;" : "=r" (res));
+    return res;
+}
+
+void new_cpu_local() {
+    struct cpu_local* new = malloc(sizeof(struct cpu_local));
+    new->meta_ptr = (uint64_t)new;
+    write_msr(GS_BASE, (uint64_t)new);
+}    
 
 void smp_init() {
     kprint("[KERNEL] Initializing APs...\n");

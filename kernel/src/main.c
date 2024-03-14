@@ -35,8 +35,8 @@ void _start(void) {
     hpet_init();
     apic_timer_init();
     smp_init();
-    //init_tss();
-    init_multitasking();
+    init_tss();
+    //init_multitasking();
 
     // We're done, just hang...
     while (1) {}
