@@ -1,4 +1,5 @@
 #include "smp.h"
+#include "devices/apic.h"
 #include "klibc/alloc.h"
 #include "klibc/string.h"
 #include "klibc/lock.h"
@@ -35,6 +36,7 @@ struct cpu_local* get_cpu_local() {
 void new_cpu_local() {
     struct cpu_local* new = malloc(sizeof(struct cpu_local));
     new->meta_ptr = (uint64_t)new;
+    new->apic_id = (uint64_t)get_lapic_id();
     write_msr(GS_BASE, (uint64_t)new);
 }    
 

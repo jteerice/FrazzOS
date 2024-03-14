@@ -30,5 +30,6 @@ struct pcb {
 }__attribute__((packed));
 
 void init_multitasking();
+void init_kernel_cpu_info();
 
 #endif

@@ -1,4 +1,5 @@
 #include "process.h"
+#include "smp/smp.h"
 #include "devices/ioapic.h"
 #include "klibc/string.h"
 #include "klibc/io.h"
@@ -32,4 +33,11 @@ void switch_to_task(struct pcb* next_proc) {
     switch_to_task_asm(next_proc);
 
     unmask_all_irq();
+}
+
+void init_kernel_cpu_info() {
+    kprint("[KERNEL] Initializing Kernel CPU Info... ");
+    new_cpu_local();
+    get_cpu_local()->cpu_id = 0;
+    kprint("Success\n");
 }

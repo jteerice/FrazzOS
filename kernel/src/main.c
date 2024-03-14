@@ -35,6 +35,7 @@ void _start(void) {
     hpet_init();
     apic_timer_init();
     smp_init();
+    init_kernel_cpu_info();
     init_tss();
     //init_multitasking();
 
