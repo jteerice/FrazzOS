@@ -9,17 +9,21 @@
 struct process* current_task;
 size_t process_id_tracker = 0;
 
-extern void switch_to_task_asm(struct process* next_proc);
+extern void switch_to_task_asm(uintptr_t next_proc_rsp, uintptr_t next_proc_cr3, uintptr_t current_rsp);
 
 struct process* create_process(char* name, void (*main)(), uint8_t ring, enum TASK_PRIORITY priority) {
-    struct process* new_proc = malloc(sizeof(struct process));
-    new_proc->kernel_top = malloc(KERNEL_STACK_SIZE) + KERNEL_STACK_SIZE;
+    struct process* new_proc = (struct process*)malloc(sizeof(struct process));
+    new_proc->kernel_top = (uintptr_t)malloc(KERNEL_STACK_SIZE);
+    memset((void*)new_proc->kernel_top, 0, KERNEL_STACK_SIZE);
+    new_proc->kernel_top += KERNEL_STACK_SIZE;
+    *((uint64_t*)new_proc->kernel_top) = (uint64_t)main;
     new_proc->id = process_id_tracker++;
     new_proc->cpu_time = 0;
     new_proc->cr3 = current_task->cr3;
     new_proc->priority = priority;
     new_proc->status = READY;
-    strncpy(new_proc, name, MAX_TASK_NAME);
+    new_proc->ring = ring;
+    strncpy(new_proc->name, name, MAX_TASK_NAME);
     memset(&new_proc->regs, 0, sizeof(struct task_regs));
     return new_proc;
 }
@@ -28,7 +32,8 @@ void init_multitasking() {
     current_task = malloc(sizeof(struct process));
     asm volatile ("mov %%rsp, %0" : "=r" (current_task->kernel_top) : : "memory");
     asm volatile ("mov %%cr3, %0" : "=r" (current_task->cr3) : : "memory");
-    current_task->next = NULL;
+    // Circular linked list
+    current_task->next = current_task;
     current_task->status = RUNNING;
     current_task->priority = HIGH;
     current_task->id = process_id_tracker;
@@ -37,13 +42,24 @@ void init_multitasking() {
     process_id_tracker++;
 }
 
-void switch_to_task(struct process* next_proc) {
+void add_process(struct process* process) {
+    struct process* tmp = current_task->next;
+    current_task->next = process;
+    process->next = tmp;
+}
+
+void test_proc_entry() {
+    kprint("Process started!\n");
+    asm volatile("cli; hlt");
+}
+
+void switch_to_task(struct process* next_proc, uintptr_t current_rsp) {
     if (next_proc == NULL) {
         return;
     }
     mask_all_irq();
 
-    switch_to_task_asm(next_proc);
+    switch_to_task_asm((uintptr_t)&next_proc->kernel_top, (uintptr_t)&next_proc->cr3, (uintptr_t)&current_rsp);
 
     unmask_all_irq();
 }

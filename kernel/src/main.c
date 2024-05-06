@@ -18,6 +18,8 @@
 #include "devices/ps2.h"
 #include "drivers/graphics/framebuffer.h"
 
+extern struct process* current_task;
+
 // linker script accordingly.
 void _start(void) {
 
@@ -37,7 +39,10 @@ void _start(void) {
     smp_init();
     init_kernel_cpu_info();
     init_tss();
-    //init_multitasking();
+    init_multitasking();
+    struct process* proc = create_process("Test Process", test_proc_entry, 0, HIGH);
+    add_process(proc);
+    switch_to_task(current_task->next, current_task->kernel_top);
 
     // We're done, just hang...
     while (1) {}

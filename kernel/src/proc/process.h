@@ -5,6 +5,7 @@
 #include <stddef.h>
 
 #define MAX_TASK_NAME 64
+#define KERNEL_STACK_SIZE 0x1000
 
 enum __attribute__((packed)) TASK_STATUS {
     READY   = 0b00000000,
@@ -47,7 +48,8 @@ struct task_regs {
 struct process {
     uintptr_t kernel_top;
     uintptr_t cr3;
-    struct pcb* next;
+    uint8_t ring;
+    struct process* next;
     enum TASK_STATUS status;
     enum TASK_PRIORITY priority;
     size_t id;
@@ -58,5 +60,9 @@ struct process {
 
 void init_multitasking();
 void init_kernel_cpu_info();
+struct process* create_process(char* name, void (*main)(), uint8_t ring, enum TASK_PRIORITY priority);
+void switch_to_task(struct process* next_proc, uintptr_t current_rsp);
+void add_process(struct process* process);
+void test_proc_entry();
 
 #endif
