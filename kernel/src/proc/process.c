@@ -9,7 +9,7 @@
 struct process* current_task;
 size_t process_id_tracker = 0;
 
-extern void switch_to_task_asm(uintptr_t next_proc_rsp, uintptr_t next_proc_cr3, uintptr_t current_rsp);
+extern void switch_to_task_asm(uintptr_t next_proc_rsp, uintptr_t next_proc_cr3, uintptr_t current_rsp, uintptr_t current_regs, uintptr_t next_regs);
 
 struct process* create_process(char* name, void (*main)(), uint8_t ring, enum TASK_PRIORITY priority) {
     struct process* new_proc = (struct process*)malloc(sizeof(struct process));
@@ -49,6 +49,9 @@ void add_process(struct process* process) {
 }
 
 void test_proc_entry() {
+    current_task->kernel_top += 8;
+    current_task = current_task->next;
+    switch_to_task(current_task->next, current_task->kernel_top);
     kprint("Process started!\n");
     asm volatile("cli; hlt");
 }
@@ -59,7 +62,8 @@ void switch_to_task(struct process* next_proc, uintptr_t current_rsp) {
     }
     mask_all_irq();
 
-    switch_to_task_asm((uintptr_t)&next_proc->kernel_top, (uintptr_t)&next_proc->cr3, (uintptr_t)&current_rsp);
+    switch_to_task_asm((uintptr_t)&next_proc->kernel_top, (uintptr_t)&next_proc->cr3, (uintptr_t)&current_rsp, (uintptr_t)&current_task->regs, (uintptr_t)&next_proc->regs);
+    current_task = current_task->next;
 
     unmask_all_irq();
 }

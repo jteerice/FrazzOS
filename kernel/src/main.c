@@ -43,6 +43,7 @@ void _start(void) {
     struct process* proc = create_process("Test Process", test_proc_entry, 0, HIGH);
     add_process(proc);
     switch_to_task(current_task->next, current_task->kernel_top);
+    kprint("Back!\n");
 
     // We're done, just hang...
     while (1) {}
