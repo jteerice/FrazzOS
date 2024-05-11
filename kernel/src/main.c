@@ -40,9 +40,9 @@ void _start(void) {
     init_kernel_cpu_info();
     init_tss();
     init_multitasking();
-    struct process* proc = create_process("Test Process", test_proc_entry, 0, HIGH);
+    struct process* proc = create_process("Test Process\0", test_proc_entry, 0, HIGH);
     add_process(proc);
-    switch_to_task(current_task->next, current_task->kernel_top);
+    switch_to_task(current_task->next);
     kprint("Back!\n");
 
     // We're done, just hang...

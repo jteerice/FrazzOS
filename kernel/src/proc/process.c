@@ -1,4 +1,5 @@
 #include "process.h"
+#include "status.h"
 #include "smp/smp.h"
 #include "klibc/memory.h"
 #include "devices/ioapic.h"
@@ -9,7 +10,7 @@
 struct process* current_task;
 size_t process_id_tracker = 0;
 
-extern void switch_to_task_asm(uintptr_t next_proc_rsp, uintptr_t next_proc_cr3, uintptr_t current_rsp, uintptr_t current_regs, uintptr_t next_regs);
+extern void switch_to_task_asm(struct process* next);
 
 struct process* create_process(char* name, void (*main)(), uint8_t ring, enum TASK_PRIORITY priority) {
     struct process* new_proc = (struct process*)malloc(sizeof(struct process));
@@ -17,6 +18,7 @@ struct process* create_process(char* name, void (*main)(), uint8_t ring, enum TA
     memset((void*)new_proc->kernel_top, 0, KERNEL_STACK_SIZE);
     new_proc->kernel_top += KERNEL_STACK_SIZE;
     *((uint64_t*)new_proc->kernel_top) = (uint64_t)main;
+    new_proc->kernel_top -= 120;
     new_proc->id = process_id_tracker++;
     new_proc->cpu_time = 0;
     new_proc->cr3 = current_task->cr3;
@@ -37,7 +39,7 @@ void init_multitasking() {
     current_task->status = RUNNING;
     current_task->priority = HIGH;
     current_task->id = process_id_tracker;
-    strncpy(current_task->name, "KERNEL", MAX_TASK_NAME);
+    strncpy(current_task->name, "KERNEL\0", MAX_TASK_NAME);
     current_task->cpu_time = 0;
     process_id_tracker++;
 }
@@ -49,23 +51,20 @@ void add_process(struct process* process) {
 }
 
 void test_proc_entry() {
+    kprint("Process started!\n");
     current_task->kernel_top += 8;
     current_task = current_task->next;
-    switch_to_task(current_task->next, current_task->kernel_top);
-    kprint("Process started!\n");
+    switch_to_task(current_task->next);
     asm volatile("cli; hlt");
 }
 
-void switch_to_task(struct process* next_proc, uintptr_t current_rsp) {
-    if (next_proc == NULL) {
-        return;
+int switch_to_task(struct process* next) {
+    if (next == NULL) {
+        return EINVARG;
     }
-    mask_all_irq();
-
-    switch_to_task_asm((uintptr_t)&next_proc->kernel_top, (uintptr_t)&next_proc->cr3, (uintptr_t)&current_rsp, (uintptr_t)&current_task->regs, (uintptr_t)&next_proc->regs);
+    switch_to_task_asm(next);
     current_task = current_task->next;
-
-    unmask_all_irq();
+    return 0;
 }
 
 void init_kernel_cpu_info() {

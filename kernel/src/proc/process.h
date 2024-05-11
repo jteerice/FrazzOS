@@ -48,6 +48,7 @@ struct task_regs {
 struct process {
     uintptr_t kernel_top;
     uintptr_t cr3;
+    struct task_regs regs;
     uint8_t ring;
     struct process* next;
     enum TASK_STATUS status;
@@ -55,13 +56,13 @@ struct process {
     size_t id;
     char name[MAX_TASK_NAME];
     size_t cpu_time;
-    struct task_regs regs;
-};
+    
+}__attribute__((packed));
 
 void init_multitasking();
 void init_kernel_cpu_info();
 struct process* create_process(char* name, void (*main)(), uint8_t ring, enum TASK_PRIORITY priority);
-void switch_to_task(struct process* next_proc, uintptr_t current_rsp);
+int switch_to_task(struct process* next);
 void add_process(struct process* process);
 void test_proc_entry();
 
