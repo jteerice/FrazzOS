@@ -1,4 +1,5 @@
 #include "process.h"
+#include "schedule.h"
 #include "status.h"
 #include "smp/smp.h"
 #include "klibc/memory.h"
@@ -8,8 +9,6 @@
 #include "klibc/alloc.h"
 
 tcb_t* current_task;
-
-extern void switch_to_task_asm(tcb_t* next, uint64_t* kernel_top);
 
 static void process_init_info(tcb_t* new_proc, void (*main)()) {
     *((uint64_t*)new_proc->kernel_top) = (uint64_t)main;
@@ -72,15 +71,7 @@ void test_proc_entry() {
     asm volatile("cli; hlt");
 }
 
-int switch_to_task(tcb_t* next) {
 
-    if (next == NULL) {
-        return EINVARG;
-    }
-
-    switch_to_task_asm(next, &current_task->kernel_top);
-    return 0;
-}
 
 void init_kernel_cpu_info() {
     kprint("[KERNEL] Initializing Kernel CPU Info... ");

@@ -55,7 +55,6 @@ typedef struct process {
 void init_multitasking();
 void init_kernel_cpu_info();
 tcb_t* create_process(void (*main)());
-int switch_to_task(tcb_t* next);
 void add_process(tcb_t* process);
 void test_proc_entry();
 

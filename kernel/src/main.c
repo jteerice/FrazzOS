@@ -1,4 +1,5 @@
 #include "gdt/gdt.h"
+#include "proc/schedule.h"
 #include "proc/process.h"
 #include "tss/tss.h"
 #include "smp/smp.h"
