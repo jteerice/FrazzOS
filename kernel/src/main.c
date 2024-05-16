@@ -40,7 +40,7 @@ void _start(void) {
     init_kernel_cpu_info();
     init_tss();
     init_multitasking();
-    struct process* proc = create_process("Test Process\0", test_proc_entry, 0, HIGH);
+    tcb_t* proc = create_process(test_proc_entry);
     add_process(proc);
     switch_to_task(current_task->next);
     kprint("Back!\n");

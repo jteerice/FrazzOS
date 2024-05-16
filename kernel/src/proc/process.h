@@ -45,25 +45,18 @@ struct task_regs {
 };
 
 
-struct process {
-    uintptr_t kernel_top;
-    uintptr_t cr3;
-    struct task_regs regs;
-    uint8_t ring;
+typedef struct process {
+    uint64_t kernel_top;
+    uint64_t cr3;
     struct process* next;
     enum TASK_STATUS status;
-    enum TASK_PRIORITY priority;
-    size_t id;
-    char name[MAX_TASK_NAME];
-    size_t cpu_time;
-    
-}__attribute__((packed));
+} tcb_t; 
 
 void init_multitasking();
 void init_kernel_cpu_info();
-struct process* create_process(char* name, void (*main)(), uint8_t ring, enum TASK_PRIORITY priority);
-int switch_to_task(struct process* next);
-void add_process(struct process* process);
+tcb_t* create_process(void (*main)());
+int switch_to_task(tcb_t* next);
+void add_process(tcb_t* process);
 void test_proc_entry();
 
 #endif

@@ -7,62 +7,81 @@
 #include "klibc/io.h"
 #include "klibc/alloc.h"
 
-struct process* current_task;
-size_t process_id_tracker = 0;
+tcb_t* current_task;
 
-extern void switch_to_task_asm(struct process* next);
+extern void switch_to_task_asm(tcb_t* next, uint64_t* kernel_top);
 
-struct process* create_process(char* name, void (*main)(), uint8_t ring, enum TASK_PRIORITY priority) {
-    struct process* new_proc = (struct process*)malloc(sizeof(struct process));
-    new_proc->kernel_top = (uintptr_t)malloc(KERNEL_STACK_SIZE);
-    memset((void*)new_proc->kernel_top, 0, KERNEL_STACK_SIZE);
-    new_proc->kernel_top += KERNEL_STACK_SIZE;
+static void process_init_info(tcb_t* new_proc, void (*main)()) {
     *((uint64_t*)new_proc->kernel_top) = (uint64_t)main;
     new_proc->kernel_top -= 120;
-    new_proc->id = process_id_tracker++;
-    new_proc->cpu_time = 0;
     new_proc->cr3 = current_task->cr3;
-    new_proc->priority = priority;
     new_proc->status = READY;
-    new_proc->ring = ring;
-    strncpy(new_proc->name, name, MAX_TASK_NAME);
-    memset(&new_proc->regs, 0, sizeof(struct task_regs));
+}
+
+static int process_init_stack(tcb_t* new_proc) {
+    new_proc->kernel_top = (uint64_t)malloc(KERNEL_STACK_SIZE);
+
+    if (new_proc->kernel_top == (uint64_t)-1) {
+        return ENOMEM;
+    }
+
+    memset((void*)new_proc->kernel_top, 0, KERNEL_STACK_SIZE);
+    new_proc->kernel_top += KERNEL_STACK_SIZE;
+    return 0;
+}
+
+tcb_t* create_process(void (*main)()){
+    tcb_t* new_proc = (tcb_t*)malloc(sizeof(tcb_t));
+
+    if (process_init_stack(new_proc) < 0) {
+        kprint("[[[PANIC]]] NO MEMORY\n");
+        for (;;) {
+            asm ("hlt");
+        }
+    }
+
+    process_init_info(new_proc, main);
     return new_proc;
 }
 
 void init_multitasking() {
-    current_task = malloc(sizeof(struct process));
+    current_task = (tcb_t*)malloc(sizeof(tcb_t));
+
+    if ((uint64_t)current_task == (uint64_t)-1) {
+        kprint("[[[PANIC]]] NO MEMORY\n");
+        for (;;) {
+            asm ("hlt");
+        }
+    }
+
     asm volatile ("mov %%rsp, %0" : "=r" (current_task->kernel_top) : : "memory");
     asm volatile ("mov %%cr3, %0" : "=r" (current_task->cr3) : : "memory");
-    // Circular linked list
     current_task->next = current_task;
     current_task->status = RUNNING;
-    current_task->priority = HIGH;
-    current_task->id = process_id_tracker;
-    strncpy(current_task->name, "KERNEL\0", MAX_TASK_NAME);
-    current_task->cpu_time = 0;
-    process_id_tracker++;
 }
 
-void add_process(struct process* process) {
-    struct process* tmp = current_task->next;
+void add_process(tcb_t* process) {
+    tcb_t* tmp = current_task->next;
     current_task->next = process;
     process->next = tmp;
 }
 
 void test_proc_entry() {
-    kprint("Process started!\n");
-    current_task->kernel_top += 8;
     current_task = current_task->next;
+    current_task->status = RUNNING;
+    kprint("Process started!\n");
     switch_to_task(current_task->next);
     asm volatile("cli; hlt");
 }
 
-int switch_to_task(struct process* next) {
+int switch_to_task(tcb_t* next) {
+
     if (next == NULL) {
         return EINVARG;
     }
-    switch_to_task_asm(next);
+
+    current_task->status = READY;
+    switch_to_task_asm(next, &current_task->kernel_top);
     current_task = current_task->next;
     return 0;
 }

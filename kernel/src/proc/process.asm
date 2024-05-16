@@ -1,5 +1,4 @@
 section .text
-extern current_task
 global switch_to_task_asm
 switch_to_task_asm:
 
@@ -22,7 +21,7 @@ switch_to_task_asm:
  
 
     ; Save rsp to current task process control block
-    mov [current_task], rsp
+    mov [rsi], rsp
 
     ; Setup new task
     mov rsp, [rdi]
