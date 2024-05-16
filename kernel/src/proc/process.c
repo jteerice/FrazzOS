@@ -67,8 +67,6 @@ void add_process(tcb_t* process) {
 }
 
 void test_proc_entry() {
-    current_task = current_task->next;
-    current_task->status = RUNNING;
     kprint("Process started!\n");
     switch_to_task(current_task->next);
     asm volatile("cli; hlt");
@@ -80,9 +78,7 @@ int switch_to_task(tcb_t* next) {
         return EINVARG;
     }
 
-    current_task->status = READY;
     switch_to_task_asm(next, &current_task->kernel_top);
-    current_task = current_task->next;
     return 0;
 }
 
