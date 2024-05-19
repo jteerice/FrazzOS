@@ -4,6 +4,6 @@
 #include "status.h"
 #include "process.h"
 
-int switch_to_task(tcb_t* next);
+void schedule();
 
 #endif

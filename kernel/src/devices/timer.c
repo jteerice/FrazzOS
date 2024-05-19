@@ -35,7 +35,6 @@ void apic_timer_init() {
     *lvt_timer_reg |= ((TIMER_IRQ + IDT_EXCEPTIONS) | TIMER_PERIODIC_MODE);
     *divide_config_reg = 0x03;
     *init_count_reg = (uint32_t)apic_ticks_10ms;
-    unmask_irq(TIMER_IRQ);
     
     kprint("Success\n");
 }

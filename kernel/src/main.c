@@ -43,8 +43,11 @@ void _start(void) {
     init_multitasking();
     tcb_t* proc = create_process(test_proc_entry);
     add_process(proc);
-    switch_to_task(current_task->next);
-    kprint("Back!\n");
+    for (int i = 0;;i++) {
+        int x = 0;
+        while (x++ != 100) {}
+        kprint("KERNEL TASK\n");
+    }
 
     // We're done, just hang...
     while (1) {}

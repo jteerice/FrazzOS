@@ -57,6 +57,7 @@ void init_multitasking() {
     asm volatile ("mov %%cr3, %0" : "=r" (current_task->cr3) : : "memory");
     current_task->next = current_task;
     current_task->status = RUNNING;
+    unmask_irq(TIMER_IRQ);
 }
 
 void add_process(tcb_t* process) {
@@ -66,8 +67,11 @@ void add_process(tcb_t* process) {
 }
 
 void test_proc_entry() {
-    kprint("Process started!\n");
-    switch_to_task(current_task->next);
+    for (int i = 0;;i++) {
+        int x = 0;
+        while (x++ != 100) {}
+        kprint("TEST PROC\n");
+    }
     asm volatile("cli; hlt");
 }
 

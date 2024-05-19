@@ -1,4 +1,5 @@
 #include "isr.h"
+#include "proc/schedule.h"
 #include "devices/cpu.h"
 #include "klibc/io.h"
 #include "devices/apic.h"
@@ -24,6 +25,6 @@ void keyboard_irq_handler() {
 }
 
 void timer_irq_handler() {
-    //kprint("Timer interrupt!\n");
+    schedule();
     lapic_write_reg(APIC_EOI_REG, 0);
 }
