@@ -18,13 +18,12 @@ static int switch_to_task(tcb_t* next) {
 static tcb_t* get_next_task() {
     tcb_t* tmp = current_task->next;
 
-    while(tmp->status != READY)
-
+    while(tmp->status != READY) {
         // No ready processes, return the current_process
-        // Probably need to implement a "head" pointer to return (aka kernel process)
         if (tmp == current_task)
             return tmp;
         tmp = tmp->next;
+    }
 
     current_task->status = READY;
     tmp->status = RUNNING;
