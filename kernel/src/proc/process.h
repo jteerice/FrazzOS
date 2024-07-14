@@ -7,6 +7,8 @@
 #define MAX_TASK_NAME 64
 #define KERNEL_STACK_SIZE 0x1000
 
+#define QUANTUM 5
+
 enum __attribute__((packed)) TASK_STATUS {
     READY   = 0b00000000,
     WAITING = 0b00000001,
@@ -50,6 +52,7 @@ typedef struct process {
     uint64_t cr3;
     struct process* next;
     enum TASK_STATUS status;
+    int time_slice;
 } tcb_t; 
 
 void init_multitasking();

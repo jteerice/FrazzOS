@@ -41,13 +41,6 @@ void _start(void) {
     init_kernel_cpu_info();
     init_tss();
     init_multitasking();
-    tcb_t* proc = create_process(test_proc_entry);
-    add_process(proc);
-    for (int i = 0;;i++) {
-        int x = 0;
-        while (x++ != 100) {}
-        kprint("KERNEL TASK\n");
-    }
 
     // We're done, just hang...
     while (1) {}

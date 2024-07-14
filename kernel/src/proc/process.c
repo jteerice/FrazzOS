@@ -15,6 +15,7 @@ static void process_init_info(tcb_t* new_proc, void (*main)()) {
     new_proc->kernel_top -= 120;
     new_proc->cr3 = current_task->cr3;
     new_proc->status = READY;
+    new_proc->time_slice = QUANTUM;
 }
 
 static int process_init_stack(tcb_t* new_proc) {
@@ -44,6 +45,7 @@ tcb_t* create_process(void (*main)()){
 }
 
 void init_multitasking() {
+    kprint("[KERNEL] Initializing Scheduler... ");
     current_task = (tcb_t*)malloc(sizeof(tcb_t));
 
     if ((uint64_t)current_task == (uint64_t)-1) {
@@ -57,6 +59,10 @@ void init_multitasking() {
     asm volatile ("mov %%cr3, %0" : "=r" (current_task->cr3) : : "memory");
     current_task->next = current_task;
     current_task->status = RUNNING;
+    current_task->time_slice = QUANTUM;
+
+    kprint("Success\n");
+
     unmask_irq(TIMER_IRQ);
 }
 
@@ -65,17 +71,6 @@ void add_process(tcb_t* process) {
     current_task->next = process;
     process->next = tmp;
 }
-
-void test_proc_entry() {
-    for (int i = 0;;i++) {
-        int x = 0;
-        while (x++ != 100) {}
-        kprint("TEST PROC\n");
-    }
-    asm volatile("cli; hlt");
-}
-
-
 
 void init_kernel_cpu_info() {
     kprint("[KERNEL] Initializing Kernel CPU Info... ");

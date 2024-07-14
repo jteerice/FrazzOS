@@ -29,7 +29,9 @@ load_idt:
 global timer_irq
 extern timer_irq_handler
 timer_irq:
+    cli
     call timer_irq_handler
+    sti
     iretq
 
 global keyboard_irq

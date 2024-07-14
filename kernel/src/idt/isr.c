@@ -1,5 +1,6 @@
 #include "isr.h"
 #include "proc/schedule.h"
+#include "proc/process.h"
 #include "devices/cpu.h"
 #include "klibc/io.h"
 #include "devices/apic.h"
@@ -8,6 +9,7 @@
 #include <backends/fb.h>
 
 extern struct flanterm_context* ft_ctx;
+extern tcb_t* current_task;
 
 void general_exception_handler() {
     kprint("No exception handler implemented!\n");
@@ -25,6 +27,10 @@ void keyboard_irq_handler() {
 }
 
 void timer_irq_handler() {
-    schedule();
     lapic_write_reg(APIC_EOI_REG, 0);
+
+    if (current_task->time_slice == 0)
+        schedule();
+    else
+        current_task->time_slice--;
 }

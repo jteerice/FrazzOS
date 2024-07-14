@@ -1,8 +1,8 @@
 section .text
 extern current_task
 global switch_to_task_asm
-switch_to_task_asm:
 
+switch_to_task_asm:
     ; Save registers
     push rax
     push rbx
@@ -57,5 +57,7 @@ switch_to_task_asm:
     pop rcx
     pop rbx
     pop rax
+
+    sti
 
     ret

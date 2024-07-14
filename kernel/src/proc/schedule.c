@@ -15,6 +15,16 @@ static int switch_to_task(tcb_t* next) {
     return 0;
 }
 
+tcb_t* get_next_task() {
+    tcb_t* tmp = current_task;
+
+    while (tmp->status != READY)
+        tmp = tmp->next;
+
+    return tmp;
+}
+
 void schedule() {
-    switch_to_task(current_task->next);
+    tcb_t* next = get_next_task();
+    switch_to_task(next);
 }
