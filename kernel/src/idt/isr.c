@@ -29,8 +29,10 @@ void keyboard_irq_handler() {
 void timer_irq_handler() {
     lapic_write_reg(APIC_EOI_REG, 0);
 
-    if (current_task->time_slice == 0)
+    if (current_task->time_slice == 0) {
+        current_task->time_slice = QUANTUM;
         schedule();
+    }
     else
         current_task->time_slice--;
 }

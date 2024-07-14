@@ -58,6 +58,4 @@ switch_to_task_asm:
     pop rbx
     pop rax
 
-    sti
-
     ret

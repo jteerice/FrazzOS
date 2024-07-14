@@ -62,7 +62,6 @@ void init_multitasking() {
     current_task->time_slice = QUANTUM;
 
     kprint("Success\n");
-
     unmask_irq(TIMER_IRQ);
 }
 

@@ -59,6 +59,5 @@ void init_multitasking();
 void init_kernel_cpu_info();
 tcb_t* create_process(void (*main)());
 void add_process(tcb_t* process);
-void test_proc_entry();
 
 #endif
