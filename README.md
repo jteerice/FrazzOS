@@ -36,7 +36,7 @@ Building this project requires a cross-compiler for x64. A great resource for cr
 - [X] HPET
 - [X] APIC-TIMER
 - [X] SMP
-- [ ] Multitasking
+- [X] Multitasking
 - [ ] Syscalls
 - [ ] Userspace
 
