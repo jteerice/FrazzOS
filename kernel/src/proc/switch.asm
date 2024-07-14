@@ -20,10 +20,6 @@ switch_to_task_asm:
     push r15
     push rbp
 
-    ; Update task status
-    mov byte [rsi+24], 0 ; READY
-    mov byte [rdi+24], 2 ; RUNNING
-
     ; Update current_task with next task being run
     mov rax, [rsi+16]
     mov [current_task], rax

@@ -9,16 +9,16 @@
 
 #define QUANTUM 5
 
-enum __attribute__((packed)) TASK_STATUS {
-    READY   = 0b00000000,
-    WAITING = 0b00000001,
-    RUNNING = 0b00000010
+enum TASK_STATUS {
+    READY,
+    WAITING,
+    RUNNING
 };
 
-enum __attribute__((packed)) TASK_PRIORITY {
-    HIGH    = 0b00000000,
-    MEDIUM  = 0b00000001,
-    LOW     = 0b00000010
+enum TASK_PRIORITY {
+    HIGH,
+    MEDIUM,
+    LOW
 };
 
 struct task_regs {
