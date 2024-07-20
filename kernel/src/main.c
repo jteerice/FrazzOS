@@ -18,6 +18,7 @@
 #include "devices/ioapic.h"
 #include "devices/ps2.h"
 #include "drivers/graphics/framebuffer.h"
+#include "disk/disk.h"
 
 extern struct process* current_task;
 
@@ -27,6 +28,7 @@ void _start(void) {
     framebuffer_init();
     //terminal_init();
     gdt_init();
+    disk_search_and_init();
     idt_init();
     pmm_init();
     vmm_init();
